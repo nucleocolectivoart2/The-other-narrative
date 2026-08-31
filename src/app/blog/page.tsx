@@ -15,7 +15,7 @@ const mockArticles = [
     slug: 'el-silencio-de-los-datos-esg',
     title: '¿De qué hablamos cuando no hablamos de datos?',
     excerpt: 'Una reflexión sobre por qué la métrica ESG a menudo se queda en la superficie y cómo habitamos la verdad en la cadena de valor.',
-    image: 'https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg',
+    image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/11%20Laboratorio%20Editorial.png',
     type: 'Reflexión',
     date: '2025-02-19',
     readTime: 10
@@ -25,7 +25,7 @@ const mockArticles = [
     slug: 'el-lenguaje-del-territorio-cop16',
     title: 'COP16: Lo que el territorio nos gritó al oído',
     excerpt: 'Más allá de las conferencias, la biodiversidad es un diálogo técnico que requiere humildad operativa.',
-    image: 'https://images.pexels.com/photos/13730514/pexels-photo-13730514.jpeg',
+    image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/07.png',
     type: 'Crónica',
     date: '2025-02-18',
     readTime: 8
@@ -51,7 +51,7 @@ export default function BlogPage() {
       <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg'}
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_04%20blog.png'}
             alt="Bitácora Header"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
@@ -68,7 +68,7 @@ export default function BlogPage() {
               <span className="italic font-normal text-primary">Abierta.</span>
             </h1>
             <p className="text-lg sm:text-xl md:text-2xl font-light text-white/70 leading-relaxed max-w-2xl">
-              Un espacio para compartir ideas, investigaciones, entrevistas y aprendizajes sobre comunicación, sostenibilidad, liderazgo y construcción de confianza.
+              Un espacio para compartir ideas, investigaciones, entrevistas y aprendizajes sobre comunicación, regeneración, liderazgo y construcción de confianza.
             </p>
           </div>
         </div>

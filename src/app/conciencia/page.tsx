@@ -21,7 +21,7 @@ export default function ConcienciaPage() {
     {
       id: 'mock-t1',
       quote: 'Ángela tiene la capacidad de transformar los datos técnicos en una narrativa que no solo informa, sino que conecta con la esencia de lo que hacemos.',
-      authorName: 'Líder de Sostenibilidad',
+      authorName: 'Líder de Regeneración',
       authorTitle: 'Organización Internacional'
     },
     {
@@ -47,7 +47,7 @@ export default function ConcienciaPage() {
       <section className="relative h-[70vh] w-full flex items-end pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/13730514/pexels-photo-13730514.jpeg'}
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_01%20mirada.png'}
             alt="Nuestra Mirada"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
@@ -82,7 +82,7 @@ export default function ConcienciaPage() {
             <h3 className="text-2xl font-bold font-headline tracking-tighter">Visión Integrada</h3>
             <ul className="space-y-4 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/60">
               <li className="flex items-center gap-3"><Target className="h-3 w-3 text-primary" /> Estrategia</li>
-              <li className="flex items-center gap-3"><Target className="h-3 w-3 text-primary" /> Sostenibilidad</li>
+              <li className="flex items-center gap-3"><Target className="h-3 w-3 text-primary" /> Regeneración</li>
               <li className="flex items-center gap-3"><Target className="h-3 w-3 text-primary" /> Cultura organizacional</li>
               <li className="flex items-center gap-3"><Target className="h-3 w-3 text-primary" /> Liderazgo</li>
               <li className="flex items-center gap-3"><Target className="h-3 w-3 text-primary" /> Participación</li>
@@ -96,7 +96,7 @@ export default function ConcienciaPage() {
       <section className="relative h-[60vh] sm:h-[75vh] w-full flex items-center justify-center overflow-hidden my-32">
         <div className="absolute inset-0 z-0">
           <Image
-            src={quoteBgImage?.imageUrl || 'https://images.pexels.com/photos/37852583/pexels-photo-37852583.jpeg'}
+            src={quoteBgImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/04_articular_realidades.png'}
             alt="Mensaje Estratégico"
             fill
             className="object-cover brightness-[0.4] transition-all duration-[5000ms]"
@@ -146,7 +146,7 @@ export default function ConcienciaPage() {
             
             <div className="space-y-16">
               <p className="text-lg md:text-xl font-light text-foreground/60 leading-relaxed text-center max-w-4xl mx-auto italic">
-                "A través de procesos de escucha, construcción de confianza, participación y diseño de narrativas para el cambio, The Other Narrative contribuye especialmente a los ODS 4, 5, 10, 16 y 17, fortaleciendo capacidades, promoviendo la inclusión y facilitando alianzas para el impacto colectivo."
+                &ldquo;A través de procesos de escucha, construcción de confianza, participación y diseño de narrativas para el cambio, The Other Narrative contribuye especialmente a los ODS 4, 5, 10, 16 y 17, fortaleciendo capacidades, promoviendo la inclusión y facilitando alianzas para el impacto colectivo.&rdquo;
               </p>
               
               <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
@@ -182,7 +182,7 @@ export default function ConcienciaPage() {
                       <div className="p-8 sm:p-16 text-center space-y-8">
                         <Quote className="h-8 w-8 text-primary/20 mx-auto" />
                         <p className="text-xl sm:text-2xl md:text-3xl font-light font-headline italic leading-relaxed text-foreground/80">
-                          "{testimonial.quote}"
+                          &ldquo;{testimonial.quote}&rdquo;
                         </p>
                         <div className="space-y-2">
                           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">{testimonial.authorName}</p>
@@ -206,7 +206,7 @@ export default function ConcienciaPage() {
             <h3 className="text-3xl font-bold font-headline tracking-tighter">Sobre The Other Narrative</h3>
           </div>
           <p className="text-lg font-light text-foreground/70 leading-relaxed max-w-4xl">
-            The Other Narrative es un laboratorio estratégico y editorial que trabaja en la intersección entre comunicación, sostenibilidad y construcción de confianza. Acompañamos organizaciones que buscan fortalecer sus narrativas, movilizar comunidades y generar conversaciones relevantes para el futuro.
+            The Other Narrative es un laboratorio estratégico y editorial que trabaja en la intersección entre comunicación, regeneración y construcción de confianza. Acompañamos organizaciones que buscan fortalecer sus narrativas, movilizar comunidades y generar conversaciones relevantes para el futuro.
           </p>
         </div>
 

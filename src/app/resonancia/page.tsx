@@ -14,7 +14,7 @@ export default function ResonanciaPage() {
       <section className="relative h-[70vh] w-full flex items-end pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg'}
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_05%20multimedia.png'}
             alt="Laboratorio Editorial"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
@@ -75,7 +75,7 @@ export default function ResonanciaPage() {
                 >
                   <div className="flex items-center gap-4">
                     <Mic2 className="h-5 w-5 text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Podcast Sostenibilidad</span>
+                    <span className="text-xs font-bold uppercase tracking-widest">The Other Narrative</span>
                   </div>
                   <ExternalLink className="h-4 w-4 opacity-40 group-hover:opacity-100" />
                 </a>

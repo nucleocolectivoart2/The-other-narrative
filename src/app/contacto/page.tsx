@@ -29,7 +29,7 @@ export default function ContactPage() {
   });
 
   const phoneNumber = "573162809797";
-  const waMessage = encodeURIComponent("Hola Ángela, vi tu bitácora y me gustaría conversar sobre sostenibilidad y comunicación.");
+  const waMessage = encodeURIComponent("Hola Ángela, vi tu bitácora y me gustaría conversar sobre regeneración y comunicación.");
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${waMessage}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,7 +63,7 @@ export default function ContactPage() {
       <section className="relative h-[60vh] w-full flex items-end pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={image?.imageUrl || 'https://images.pexels.com/photos/2635817/pexels-photo-2635817.jpeg'}
+            src={image?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_06%20contacto.png'}
             alt="Contacto Header"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"

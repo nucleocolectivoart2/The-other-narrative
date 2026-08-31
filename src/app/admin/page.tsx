@@ -178,7 +178,7 @@ export default function AdminDashboard() {
   const [blogType, setBlogType] = useState('Reflexión');
   const [blogImage, setBlogImage] = useState('');
   const [blogAuthorName, setBlogAuthorName] = useState('Ángela María Gómez Duque');
-  const [blogAuthorTitle, setBlogAuthorTitle] = useState('Periodista experta en sostenibilidad');
+  const [blogAuthorTitle, setBlogAuthorTitle] = useState('Periodista experta en regeneración');
   const [blocks, setBlocks] = useState<ContentBlock[]>([{ id: 'init-1', type: 'text', content: '', alignment: 'justify' }]);
 
   const [podTitle, setPodTitle] = useState('');
@@ -442,7 +442,7 @@ export default function AdminDashboard() {
                               </span>
                             )}
                           </div>
-                          <p className="text-sm font-light text-foreground/80 leading-relaxed italic">"{msg.message}"</p>
+                          <p className="text-sm font-light text-foreground/80 leading-relaxed italic">&ldquo;{msg.message}&rdquo;</p>
                         </div>
                         <div className="flex items-center gap-3">
                           {!msg.read && (
@@ -559,7 +559,7 @@ export default function AdminDashboard() {
                             <TableRow key={item.id} className="border-b">
                               <TableCell className="pl-12 py-6">
                                 <div>
-                                  <h4 className="font-headline text-base font-bold italic">"{item.quote}"</h4>
+                                  <h4 className="font-headline text-base font-bold italic">&ldquo;{item.quote}&rdquo;</h4>
                                   <p className="text-xs text-muted-foreground mt-1">{item.authorName} — {item.authorTitle}</p>
                                 </div>
                               </TableCell>
@@ -725,11 +725,11 @@ export default function AdminDashboard() {
                                           <span className="text-[9px] font-bold text-primary uppercase tracking-[0.3em]">Resultado Sugerido:</span>
                                           <ScrollArea className="h-[300px] w-full p-6 bg-white border border-primary/10 rounded-sm">
                                              <div className="prose prose-sm font-light text-foreground/80 leading-relaxed italic">
-                                               "{aiResult.refinedText}"
+                                               &ldquo;{aiResult.refinedText}&rdquo;
                                              </div>
                                              <div className="mt-8 pt-6 border-t border-dashed">
                                                 <span className="text-[9px] font-bold uppercase tracking-widest block mb-4">Insight Regenerativo:</span>
-                                                <p className="text-sm font-headline italic text-primary">"{aiResult.regenerativeInsight}"</p>
+                                                <p className="text-sm font-headline italic text-primary">&ldquo;{aiResult.regenerativeInsight}&rdquo;</p>
                                              </div>
                                           </ScrollArea>
                                         </div>

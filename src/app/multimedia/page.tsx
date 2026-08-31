@@ -47,7 +47,7 @@ const defaultVideos = [
 
 export default function MultimediaPage() {
   const firestore = useFirestore();
-  const bannerImage = PlaceHolderImages.find(img => img.id === 'resonancia-bg');
+  const bannerImage = PlaceHolderImages.find(img => img.id === 'multimedia-bg') || PlaceHolderImages.find(img => img.id === 'resonancia-bg');
 
   const [activePodcast, setActivePodcast] = useState<PodcastEpisode | any>(null);
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
@@ -84,8 +84,8 @@ export default function MultimediaPage() {
     return url;
   };
 
-  const defaultPodcastImage = 'https://images.pexels.com/photos/631909/pexels-photo-631909.jpeg';
-  const defaultVideoImage = 'https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg';
+  const defaultPodcastImage = 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/10%20Laboratorio%20Editorial.png';
+  const defaultVideoImage = 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/05.png';
 
   const getVideoThumbnail = (video: any, ytId: string | null) => {
     if (video.thumbnail) return video.thumbnail;
@@ -115,7 +115,7 @@ export default function MultimediaPage() {
       <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg'}
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_05%20multimedia.png'}
             alt="Multimedia"
             fill
             referrerPolicy="no-referrer"
@@ -148,7 +148,7 @@ export default function MultimediaPage() {
               <h2 className="text-3xl sm:text-4xl font-bold font-headline tracking-tighter">Programas & Series</h2>
             </div>
             <p className="text-muted-foreground text-sm max-w-md">
-              Explora las narrativas, líderes y aprendizajes que impulsan la sostenibilidad y la regeneración en Iberoamérica.
+              Explora las narrativas, líderes y aprendizajes que impulsan la transformación y la regeneración en Iberoamérica.
             </p>
           </div>
 

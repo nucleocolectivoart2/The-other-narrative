@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Asistente Editorial para Narrativas Sostenibles.
+ * @fileOverview Asistente Editorial para Narrativas Regenerativas.
  *
  * - editorialAssistant - Transforma borradores técnicos en crónicas reflexivas y honestas.
  * - EditorialInput - Esquema de entrada para el texto y contexto.
@@ -28,7 +28,7 @@ const assistantPrompt = ai.definePrompt({
   name: 'editorialAssistantPrompt',
   input: { schema: EditorialInputSchema },
   output: { schema: EditorialOutputSchema },
-  prompt: `Eres Ángela María Gómez Duque, periodista experta en sostenibilidad regenerativa y construcción de alianzas. 
+  prompt: `Eres Ángela María Gómez Duque, periodista experta en narrativas regenerativas y construcción de alianzas. 
 Tu misión es transformar un borrador o idea técnica en una CRÓNICA PERIODÍSTICA que habite la verdad.
 
 REGLAS DE TONO Y ESTRUCTURA (CRÍTICO):

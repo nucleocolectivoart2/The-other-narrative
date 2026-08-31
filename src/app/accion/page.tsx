@@ -14,8 +14,8 @@ export default function AccionPage() {
       <section className="relative h-[70vh] w-full flex items-end pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/601047/pexels-photo-601047.jpeg'}
-            alt="Proceso y Sostenibilidad"
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/13%20Pensemos%20en%20Regeneracion.png'}
+            alt="Proceso y Regeneración"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
             priority
@@ -25,7 +25,7 @@ export default function AccionPage() {
           <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-8 block animate-in slide-in-from-bottom-4 duration-700">Capítulo 03</span>
           <div className="max-w-4xl animate-in slide-in-from-bottom-8 duration-1000">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-8 tracking-tighter text-white">
-              Sostenibilidad <br />
+              Regeneración <br />
               <span className="italic font-normal text-primary">& Proceso.</span>
             </h1>
           </div>
@@ -40,16 +40,16 @@ export default function AccionPage() {
                 <Leaf className="h-6 w-6 text-primary" />
                 <span className="text-primary font-bold text-[10px] tracking-[0.4em] uppercase">Área 05</span>
               </div>
-              <h3 className="text-3xl font-bold font-headline tracking-tighter">Comunicación para la Sostenibilidad</h3>
+              <h3 className="text-3xl font-bold font-headline tracking-tighter">Comunicación para la Regeneración</h3>
               <p className="text-lg font-light text-foreground/70 leading-relaxed italic">
                 Llevamos los compromisos ambientales y sociales al centro de la conversación estratégica, transformando datos en historias de impacto real.
               </p>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-sm font-light text-foreground/60 leading-relaxed border-l border-primary/20 pl-8">
-                <li>• Narrativas de sostenibilidad</li>
+                <li>• Narrativas de regeneración</li>
                 <li>• Storytelling de impacto</li>
                 <li>• Comunicación de programas sociales y ambientales</li>
                 <li>• Estrategias de sensibilización</li>
-                <li>• Comunicación interna para sostenibilidad</li>
+                <li>• Comunicación interna para regeneración</li>
                 <li>• Capacitación para equipos y líderes</li>
               </ul>
             </div>
@@ -58,7 +58,7 @@ export default function AccionPage() {
           <div className="lg:col-span-5 bg-muted/10 p-12 rounded-sm border border-border/50 h-fit">
             <Sparkles className="h-8 w-8 text-primary mb-8" />
             <p className="text-lg font-light text-foreground/70 leading-relaxed italic">
-              "No creemos en comunicar por comunicar. Creemos en construir conversaciones que ayuden a generar valor para los negocios, la sociedad y el planeta."
+              &ldquo;No creemos en comunicar por comunicar. Creemos en construir conversaciones que ayuden a generar valor para los negocios, la sociedad y el planeta.&rdquo;
             </p>
           </div>
         </div>

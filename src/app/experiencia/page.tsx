@@ -21,11 +21,11 @@ import { cn } from '@/lib/utils';
 
 export default function ExperienciaPage() {
   const bannerImage = PlaceHolderImages.find(img => img.id === 'experiencia-bg');
-  const estrategiaImg = "https://images.pexels.com/photos/631909/pexels-photo-631909.jpeg";
-  const membresiaImg = "https://images.pexels.com/photos/13730514/pexels-photo-13730514.jpeg";
-  const editorialImg = "https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg";
-  const formacionImg = "https://images.pexels.com/photos/927414/pexels-photo-927414.jpeg";
-  const sostenibilidadImg = "https://images.pexels.com/photos/601047/pexels-photo-601047.jpeg";
+  const estrategiaImg = "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/08%20comunicacion_organizaciona_y_narrativa.png";
+  const membresiaImg = "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/09%20comunicacion_y_comunidades.png";
+  const editorialImg = "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/10%20Laboratorio%20Editorial.png";
+  const formacionImg = "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/12%20formacion_y_capacitacion.png";
+  const regeneracionImg = "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/13%20Pensemos%20en%20Regeneracion.png";
 
   const phoneNumber = "573162809797";
 
@@ -192,7 +192,7 @@ export default function ExperienciaPage() {
                 <div className="space-y-3">
                   <h4 className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-primary border-b pb-2">Conferencias</h4>
                   <ul className="space-y-2 text-[11px] sm:text-xs font-light text-foreground/50">
-                    <li>• Comunicar la sostenibilidad</li>
+                    <li>• Comunicar la regeneración</li>
                     <li>• Periodismo de soluciones</li>
                     <li>• Narrativas de confianza</li>
                   </ul>
@@ -217,10 +217,10 @@ export default function ExperienciaPage() {
             </div>
           </div>
 
-          {/* 05. Comunicación para la Sostenibilidad (Destacado) */}
+          {/* 05. Comunicación para la Regeneración (Destacado) */}
           <div className="group bg-muted/20 rounded-sm border border-primary/20 hover:border-primary transition-all duration-700 shadow-xl md:col-span-2 overflow-hidden flex flex-col lg:flex-row">
             <div className="relative lg:w-2/5 min-h-[250px] sm:min-h-[300px] flex items-center justify-center">
-              <Image src={sostenibilidadImg} alt="Sostenibilidad" fill className="object-cover brightness-[0.4] group-hover:scale-105 transition-transform duration-[2000ms]" />
+              <Image src={regeneracionImg} alt="Regeneración" fill className="object-cover brightness-[0.4] group-hover:scale-105 transition-transform duration-[2000ms]" />
               <div className="relative z-10 text-center px-8 sm:px-10">
                 <Leaf className="h-8 w-8 sm:h-10 sm:w-10 text-primary mb-4 sm:mb-6 mx-auto" />
                 <h3 className="text-2xl sm:text-3xl md:text-5xl font-bold font-headline tracking-tighter text-white uppercase">Pensemos en Regeneración</h3>
@@ -235,7 +235,7 @@ export default function ExperienciaPage() {
                   </p>
                 </div>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 sm:gap-x-12 gap-y-3 sm:gap-y-4 text-[12px] sm:text-[13px] font-light text-foreground/60 leading-relaxed border-l border-primary/20 pl-6">
-                  <li>• Narrativas de sostenibilidad</li>
+                  <li>• Narrativas de regeneración</li>
                   <li>• Storytelling de impacto real</li>
                   <li>• Comunicación de programas</li>
                   <li>• Estrategias de sensibilización</li>
@@ -244,7 +244,7 @@ export default function ExperienciaPage() {
                 </ul>
                 <Button asChild className="w-full bg-secondary text-white hover:bg-primary transition-all h-12 sm:h-14 rounded-sm text-[9px] sm:text-[10px] tracking-[0.2em] font-bold border-0 shadow-lg mt-6">
                   <a 
-                    href={getWhatsAppUrl("Hola Ángela, me gustaría conversar sobre sostenibilidad con The Other Narrative.")}
+                    href={getWhatsAppUrl("Hola Ángela, me gustaría conversar sobre regeneración con The Other Narrative.")}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

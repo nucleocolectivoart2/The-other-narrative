@@ -71,7 +71,7 @@ export default function GlobalError({
         </div>
 
         <p className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-30 pt-4">
-          Bitácora de Sostenibilidad | Ángela Gómez
+          Bitácora de Regeneración | Ángela Gómez
         </p>
       </div>
     </div>

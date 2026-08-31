@@ -1,3 +1,119 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Banner principal Home",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_01%20mirada.png"
+    },
+    {
+      "id": "conciencia-bg",
+      "description": "Nuestra Mirada Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_01%20mirada.png"
+    },
+    {
+      "id": "experiencia-bg",
+      "description": "Áreas de Trabajo Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_02%20areas.png"
+    },
+    {
+      "id": "proyectos-bg",
+      "description": "Casos en Acción Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_03%20proyectos.png"
+    },
+    {
+      "id": "bitacora",
+      "description": "Bitácora Abierta Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_04%20blog.png"
+    },
+    {
+      "id": "multimedia-bg",
+      "description": "Multimedia & Diálogo Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_05%20multimedia.png"
+    },
+    {
+      "id": "contacto",
+      "description": "Contacto Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_06%20contacto.png"
+    },
+    {
+      "id": "contacto-bg",
+      "description": "Contacto Fondo",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_06%20contacto.png"
+    },
+    {
+      "id": "accion-bg",
+      "description": "Regeneración & Proceso Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/13%20Pensemos%20en%20Regeneracion.png"
+    },
+    {
+      "id": "resonancia-bg",
+      "description": "Laboratorio Editorial Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_05%20multimedia.png"
+    },
+    {
+      "id": "coherencia-bg",
+      "description": "Integridad & Coherencia Banner",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/12%20formacion_y_capacitacion.png"
+    },
+    {
+      "id": "desafio-bg",
+      "description": "Articular Realidades",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/01_articular_realidades.png"
+    },
+    {
+      "id": "conciencia-quote-bg",
+      "description": "Cita Narrativa",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/04_articular_realidades.png"
+    },
+    {
+      "id": "estrategia-narrativa",
+      "description": "Comunicación organizacional y narrativa estratégica",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/08%20comunicacion_organizaciona_y_narrativa.png"
+    },
+    {
+      "id": "comunicacion-comunidades",
+      "description": "Comunicación y Comunidades",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/09%20comunicacion_y_comunidades.png"
+    },
+    {
+      "id": "laboratorio-editorial",
+      "description": "Laboratorio Editorial",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/10%20Laboratorio%20Editorial.png"
+    },
+    {
+      "id": "formacion-capacitacion",
+      "description": "Formación y Capacitación",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/12%20formacion_y_capacitacion.png"
+    },
+    {
+      "id": "pensemos-regeneracion",
+      "description": "Pensemos en Regeneración",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/13%20Pensemos%20en%20Regeneracion.png"
+    },
+    {
+      "id": "img-03",
+      "description": "Archivo Visual 03",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/03.png"
+    },
+    {
+      "id": "img-05",
+      "description": "Archivo Visual 05",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/05.png"
+    },
+    {
+      "id": "img-06",
+      "description": "Archivo Visual 06",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/06.png"
+    },
+    {
+      "id": "img-07",
+      "description": "Archivo Visual 07",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/07.png"
+    },
+    {
+      "id": "img-11",
+      "description": "Laboratorio Editorial 11",
+      "imageUrl": "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/11%20Laboratorio%20Editorial.png"
+    }
+  ]
 }

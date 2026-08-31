@@ -84,7 +84,7 @@ export default function ArticleDetailPage() {
                  <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" /> 
                  <div className="flex flex-col">
                    <span>{article?.authorName || 'Ángela Gómez'}</span>
-                   <span className="opacity-50 text-[7px] sm:text-[8px] tracking-widest lowercase italic">{article?.authorTitle || 'Periodista en Sostenibilidad'}</span>
+                   <span className="opacity-50 text-[7px] sm:text-[8px] tracking-widest lowercase italic">{article?.authorTitle || 'Periodista en Regeneración'}</span>
                  </div>
                </div>
                <div className="flex items-center gap-3">

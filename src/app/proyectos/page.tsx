@@ -11,7 +11,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function ProyectosPage() {
   const firestore = useFirestore();
-  const bannerImage = PlaceHolderImages.find(img => img.id === 'experiencia-bg');
+  const bannerImage = PlaceHolderImages.find(img => img.id === 'proyectos-bg');
 
   const projectsQuery = useMemoFirebase(() => query(collection(firestore, 'projects')), [firestore]);
   const { data: projects, isLoading } = useCollection(projectsQuery);
@@ -20,9 +20,9 @@ export default function ProyectosPage() {
     {
       id: 'mock-p1',
       title: 'Estrategia COP16: Diálogos de Cambio',
-      category: 'Sostenibilidad',
+      category: 'Regeneración',
       description: 'Construcción de la narrativa estratégica para el Hub de Comunicación Responsable durante la cumbre de biodiversidad más importante del mundo.',
-      image: 'https://images.pexels.com/photos/13730514/pexels-photo-13730514.jpeg',
+      image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/03.png',
       link: '#',
       ods: [16, 17, 10]
     },
@@ -31,7 +31,7 @@ export default function ProyectosPage() {
       title: 'Narrativas para el Pacto Global',
       category: 'Estrategia',
       description: 'Refinamiento editorial y construcción de mensajes clave para la Red Colombia del Pacto Global de las Naciones Unidas.',
-      image: 'https://images.pexels.com/photos/631909/pexels-photo-631909.jpeg',
+      image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/05.png',
       link: '#',
       ods: [17, 4, 16]
     }
@@ -44,7 +44,7 @@ export default function ProyectosPage() {
       <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/631909/pexels-photo-631909.jpeg'}
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_03%20proyectos.png'}
             alt="Proyectos"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
@@ -80,7 +80,7 @@ export default function ProyectosPage() {
               >
                 <div className="relative aspect-[16/10] overflow-hidden rounded-sm bg-muted shadow-sm group-hover:shadow-2xl transition-all duration-700">
                   <Image
-                    src={project.image || 'https://images.pexels.com/photos/1190906/pexels-photo-1190906.jpeg'}
+                    src={project.image || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/06.png'}
                     alt={project.title}
                     fill
                     className="object-cover transition-all duration-1000 scale-100 group-hover:scale-105"

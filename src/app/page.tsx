@@ -162,11 +162,11 @@ export default function HomePage() {
             <div className="lg:col-span-5 order-2 lg:order-1">
               <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm shadow-2xl bg-muted group">
                 <Image
-                  src="https://images.pexels.com/photos/631909/pexels-photo-631909.jpeg"
+                  src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/01_articular_realidades.png"
                   alt="Articulación de Realidades"
                   fill
                   referrerPolicy="no-referrer"
-                  className="object-cover grayscale brightness-90 contrast-110 group-hover:scale-105 transition-transform duration-[3000ms]"
+                  className="object-cover brightness-90 contrast-105 group-hover:scale-105 transition-transform duration-[3000ms]"
                 />
                 <div className="absolute inset-0 border-[20px] border-white/5 pointer-events-none" />
               </div>
@@ -191,7 +191,7 @@ export default function HomePage() {
                 <div className="relative pl-10 py-4">
                   <div className="absolute left-0 top-0 h-full w-[1px] bg-gradient-to-b from-primary via-primary/40 to-transparent" />
                   <p className="text-base sm:text-lg text-muted-foreground font-light leading-relaxed italic">
-                    "No creemos en comunicar por comunicar. Creemos en construir conversaciones que ayuden a generar valor para los negocios, la sociedad y el planeta."
+                    &ldquo;No creemos en comunicar por comunicar. Creemos en construir conversaciones que ayuden a generar valor para los negocios, la sociedad y el planeta.&rdquo;
                   </p>
                 </div>
               </div>

@@ -14,7 +14,7 @@ export default function CoherenciaPage() {
       <section className="relative h-[70vh] w-full flex items-end pb-24 overflow-hidden border-b bg-black">
         <div className="absolute inset-0 z-0">
           <Image
-            src={bannerImage?.imageUrl || 'https://images.pexels.com/photos/927414/pexels-photo-927414.jpeg'}
+            src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/12%20formacion_y_capacitacion.png'}
             alt="Formación y Propósito"
             fill
             className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
@@ -42,14 +42,14 @@ export default function CoherenciaPage() {
               </div>
               <h3 className="text-3xl font-bold font-headline tracking-tighter">Maquillaje o Verdad</h3>
               <p className="text-xl font-light text-foreground/70 leading-relaxed italic">
-                La integridad organizacional no es una opción estética, es el único valor innegociable que garantiza la sostenibilidad a largo plazo.
+                La integridad organizacional no es una opción estética, es el único valor innegociable que garantiza la regeneración a largo plazo.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                 <div className="space-y-6">
                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary border-b pb-2">Conferencias</h4>
                   <ul className="space-y-3 text-sm font-light text-foreground/60 italic leading-relaxed">
-                    <li>• Cómo comunicar la sostenibilidad</li>
+                    <li>• Cómo comunicar la regeneración</li>
                     <li>• Periodismo de soluciones</li>
                     <li>• Narrativas que generan confianza</li>
                     <li>• Comunicación responsable</li>
