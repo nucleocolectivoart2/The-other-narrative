@@ -1,0 +1,133 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user with administrative capabilities.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "isAdmin": { "type": "boolean" }
+      },
+      "required": ["uid", "isAdmin"]
+    },
+    "ContentItem": {
+      "title": "ContentItem",
+      "type": "object",
+      "description": "News, articles, and chronicles.",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "type": { "type": "string" },
+        "image": { "type": "string", "format": "uri" },
+        "body": { "type": "string" },
+        "slug": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorTitle": { "type": "string" }
+      },
+      "required": ["id", "title", "date", "type", "body", "slug", "excerpt"]
+    },
+    "Podcast": {
+      "title": "Podcast",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "guest": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "description": { "type": "string" },
+        "image": { "type": "string", "format": "uri" }
+      },
+      "required": ["id", "title", "url"]
+    },
+    "Project": {
+      "title": "Project",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "image": { "type": "string", "format": "uri" },
+        "description": { "type": "string" },
+        "link": { "type": "string", "format": "uri" },
+        "category": { "type": "string" },
+        "ods": { "type": "array", "items": { "type": "number" }, "description": "Relación con Objetivos de Desarrollo Sostenible (4, 5, 10, 16, 17)." }
+      },
+      "required": ["id", "title", "link"]
+    },
+    "Resource": {
+      "title": "Resource",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "link": { "type": "string", "format": "uri" },
+        "type": { "type": "string" }
+      },
+      "required": ["id", "title", "link"]
+    },
+    "Recognition": {
+      "title": "Recognition",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "organization": { "type": "string" },
+        "year": { "type": "number" }
+      },
+      "required": ["id", "title", "organization", "year"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "quote": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorTitle": { "type": "string" }
+      },
+      "required": ["id", "quote", "authorName"]
+    },
+    "FeaturedVideo": {
+      "title": "FeaturedVideo",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "platform": { "type": "string" }
+      },
+      "required": ["id", "title", "url", "platform"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "type": "object",
+      "description": "Messages sent from the contact form.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["name", "email", "message"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "google.com"]
+  },
+  "firestore": {
+    "/contentItems/{id}": { "schema": "ContentItem", "description": "Public chronicles and articles." },
+    "/podcasts/{id}": { "schema": "Podcast", "description": "Podcast episodes." },
+    "/projects/{id}": { "schema": "Project", "description": "Case studies and initiatives." },
+    "/resources/{id}": { "schema": "Resource", "description": "Downloadable technical guides." },
+    "/recognitions/{id}": { "schema": "Recognition", "description": "Awards and mentions." },
+    "/testimonials/{id}": { "schema": "Testimonial", "description": "Client quotes." },
+    "/featuredVideos/{id}": { "schema": "FeaturedVideo", "description": "Curated video content." },
+    "/adminRoles/{userId}": { "schema": "User", "description": "Administrative roles mapping." },
+    "/messages/{id}": { "schema": "ContactMessage", "description": "Messages from users." }
+  }
+}
