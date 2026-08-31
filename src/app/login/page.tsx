@@ -20,8 +20,7 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   GoogleAuthProvider, 
-  signInWithPopup,
-  browserPopupBlockedHandler
+  signInWithPopup
 } from 'firebase/auth';
 import Link from 'next/link';
 
