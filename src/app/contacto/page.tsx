@@ -4,11 +4,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Linkedin, Send, ArrowLeft, Loader2, CheckCircle2, MessageCircle, Sparkles, ArrowUpRight } from 'lucide-react';
+import { Mail, Linkedin, Send, ArrowLeft, Loader2, CheckCircle2, MessageCircle, Sparkles, ArrowUpRight, User, BookOpen, Quote, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger, 
+  DialogClose 
+} from '@/components/ui/dialog';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useFirestore } from '@/firebase';
 import { collection, serverTimestamp } from 'firebase/firestore';
@@ -22,6 +30,7 @@ export default function ContactPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -86,21 +95,21 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <div className="section-container py-16 md:py-24 space-y-24">
-        {/* Banner Editorial Perfil Ángela Gómez Duque */}
-        <section className="relative overflow-hidden rounded-2xl border border-border/60 bg-white shadow-xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[580px] relative">
+      {/* Banner Editorial Perfil Ángela Gómez Duque - Diseño Panorámico y Alta Legibilidad */}
+      <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-white shadow-2xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[560px] lg:min-h-[620px] relative">
             {/* Background Image Layer for Wide Viewports */}
             <div className="absolute inset-0 z-0 pointer-events-none hidden md:block">
               <Image
                 src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/perfil.png"
                 alt="Ángela María Gómez Duque - Dirección Editorial y Estrategia Narrativa"
                 fill
-                className="object-cover object-[78%_center] lg:object-right opacity-95"
+                className="object-cover object-[92%_center] lg:object-[95%_center] xl:object-right"
                 priority
               />
-              {/* Soft Gradient Mask for Typography Legibility on Left Side */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent md:w-[65%] lg:w-[58%]" />
+              {/* Solid high-contrast white backing on the left 52%, feathering smoothly toward the photo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-white via-white via-50% md:via-white/95 md:via-58% to-transparent md:w-[75%] lg:w-[65%]" />
             </div>
 
             {/* Mobile Image Layer */}
@@ -109,40 +118,50 @@ export default function ContactPage() {
                 src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/perfil.png"
                 alt="Ángela María Gómez Duque"
                 fill
-                className="object-cover object-[75%_top]"
+                className="object-cover object-[80%_top]"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/70 to-transparent" />
             </div>
 
             {/* Left Content Area - Editorial Text */}
-            <div className="relative z-10 lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-between space-y-8 bg-white/90 md:bg-transparent backdrop-blur-xs md:backdrop-blur-none">
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.25em]">
+            <div className="relative z-10 lg:col-span-6 xl:col-span-6 p-8 sm:p-12 lg:p-14 xl:p-16 flex flex-col justify-between space-y-8 bg-white/95 md:bg-transparent">
+              <div className="space-y-6 max-w-xl">
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.25em]">
                   <Sparkles className="h-3 w-3" />
                   <span>Dirección Editorial & Estrategia Narrativa</span>
                 </div>
 
                 <div className="space-y-2">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-headline tracking-tighter text-foreground leading-[1.05]">
+                  <h2 className="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-bold font-headline tracking-tighter text-foreground leading-[1.08]">
                     Ángela María Gómez Duque
                   </h2>
-                  <p className="text-sm sm:text-base font-semibold text-primary tracking-wide">
-                    Comunicación Estratégica · Redes de Aprendizaje · Sostenibilidad & Regeneración
+                  <p className="text-xs sm:text-sm font-semibold text-primary tracking-wider uppercase">
+                    Comunicación Estratégica · Redes de Aprendizaje · Regeneración & Impacto
                   </p>
                 </div>
 
-                <blockquote className="border-l-2 border-primary/60 pl-5 my-4 text-base sm:text-lg italic text-foreground/80 leading-relaxed font-serif">
+                <blockquote className="border-l-2 border-primary/70 pl-5 my-3 text-base sm:text-lg italic text-foreground/90 leading-relaxed font-serif bg-primary/[0.03] py-2.5 pr-4 rounded-r-sm">
                   &ldquo;La comunicación no es solo transmitir información: es crear el tejido donde las organizaciones, las personas y los territorios se reconocen para transformar realidades.&rdquo;
                 </blockquote>
 
-                <p className="text-sm sm:text-base font-light text-foreground/70 leading-relaxed max-w-xl">
+                <p className="text-sm sm:text-base font-light text-foreground/80 leading-relaxed">
                   Acompaño a organizaciones, colectivos y líderes a articular historias honestas, trascendentes y conectadas con la verdad de sus proyectos. Te invito a abrir un espacio de diálogo para explorar cómo tejer juntos narrativas que inspiren a la acción.
                 </p>
               </div>
 
               {/* Action Links & Direct Triggers */}
-              <div className="pt-4 border-t border-border/50 flex flex-wrap items-center gap-4">
+              <div className="pt-4 border-t border-border/50 flex flex-wrap items-center gap-3.5">
+                <button
+                  type="button"
+                  onClick={() => setIsAboutModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-foreground text-background hover:bg-foreground/90 text-xs font-bold uppercase tracking-wider transition-all shadow-md group cursor-pointer"
+                >
+                  <User className="h-4 w-4 text-primary" />
+                  <span>Quién soy</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
+
                 <a
                   href={whatsappUrl}
                   target="_blank"
@@ -166,7 +185,7 @@ export default function ContactPage() {
                   href="https://www.linkedin.com/in/angelamgomezd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-3 rounded-sm border border-border/60 hover:border-primary text-foreground/70 hover:text-foreground text-xs font-medium transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-3 rounded-sm border border-border/60 hover:border-primary bg-white text-foreground/80 hover:text-foreground text-xs font-medium transition-all"
                 >
                   <Linkedin className="h-4 w-4 text-primary" />
                   <span>LinkedIn</span>
@@ -174,12 +193,110 @@ export default function ContactPage() {
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Canales Directos y Formulario de Contacto */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
-          {/* Columna Izquierda: Canales Directos Mejorados */}
-          <div className="lg:col-span-5 space-y-10">
+        {/* Modal Editorial: Quién soy */}
+        <Dialog open={isAboutModalOpen} onOpenChange={setIsAboutModalOpen}>
+          <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl border border-border/80 bg-background shadow-2xl max-h-[92vh] flex flex-col">
+            {/* Banner Visual Superior con Arte Editorial */}
+            <div className="relative w-full h-44 sm:h-60 md:h-64 bg-zinc-950 flex-shrink-0 overflow-hidden">
+              <Image
+                src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/logo-13.png"
+                alt="Quién soy - The Other Narrative"
+                fill
+                className="object-cover object-center"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-black/40 pointer-events-none" />
+              <div className="absolute top-4 left-4 z-20">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white/95 text-[10px] font-bold uppercase tracking-[0.2em] border border-white/15 shadow-sm">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                  Manifiesto & Trayectoria
+                </span>
+              </div>
+            </div>
+
+            {/* Contenido Editorial con Scroll Fluido */}
+            <div className="p-6 sm:p-8 md:p-10 overflow-y-auto space-y-6 text-foreground">
+              <div className="space-y-2 border-b border-border/60 pb-5">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-headline tracking-tight text-foreground">
+                  Quién soy
+                </h2>
+                <p className="text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">
+                  Ángela María Gómez Duque · Dirección Editorial & Estrategia Narrativa
+                </p>
+              </div>
+
+              <div className="space-y-5 text-sm sm:text-base leading-relaxed text-foreground/85 font-light">
+                <p className="text-base sm:text-lg text-foreground font-normal leading-relaxed">
+                  Soy una mujer curiosa, creadora y profundamente inquieta. Me gusta hacer preguntas, conectar mundos que normalmente no conversan y encontrar maneras diferentes de hacer las cosas.
+                </p>
+
+                {/* Destacado Editorial */}
+                <div className="my-5 p-5 sm:p-6 rounded-lg bg-primary/5 border-l-4 border-primary shadow-xs">
+                  <p className="text-lg sm:text-xl md:text-2xl font-serif italic text-foreground font-medium leading-snug">
+                    &ldquo;No me interesa copiar modelos. Me interesa crearlos.&rdquo;
+                  </p>
+                </div>
+
+                <p>
+                  Soy comunicadora y estratega, y durante mi carrera he convertido ideas en áreas, estrategias, plataformas, contenidos y comunidades alrededor de la comunicación, la innovación social, la economía circular y la regeneración.
+                </p>
+
+                <p>
+                  He trabajado en escenarios complejos —desde la construcción de paz hasta los desafíos empresariales y ambientales— y eso me ha enseñado que transformar también implica cambiar las historias que contamos y la manera como las contamos.
+                </p>
+
+                <div className="pt-4 border-t border-border/50 space-y-2">
+                  <p className="text-foreground/90 font-medium">
+                    Hoy sigo creando, investigando, enseñando y haciendo preguntas.
+                  </p>
+                  <p className="text-base sm:text-lg text-primary font-headline font-semibold italic">
+                    Porque creo que otras narrativas pueden abrir otras posibilidades.
+                  </p>
+                </div>
+              </div>
+
+              {/* Botones de Acción dentro del Modal */}
+              <div className="pt-6 border-t border-border/60 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm bg-primary text-white text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-all shadow-xs"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    <span>Conversar por WhatsApp</span>
+                  </a>
+                  <a
+                    href="mailto:angelamgomez@gmail.com"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm border border-border bg-background hover:border-primary text-foreground text-xs font-bold uppercase tracking-wider transition-all"
+                  >
+                    <Mail className="h-3.5 w-3.5 text-primary" />
+                    <span>Escribir Correo</span>
+                  </a>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsAboutModalOpen(false)}
+                  className="text-xs uppercase font-medium tracking-wider text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </section>
+
+      {/* Canales Directos y Formulario de Contacto */}
+      <div className="section-container pb-16 md:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+          {/* Columna Izquierda: Canales Directos */}
+          <div className="lg:col-span-5 space-y-8">
             <div className="space-y-4">
               <span className="text-primary font-bold tracking-[0.4em] uppercase text-[10px] block">
                 Atención Personalizada
@@ -187,15 +304,15 @@ export default function ContactPage() {
               <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">
                 Canales Directos
               </h2>
-              <p className="text-foreground/70 font-light leading-relaxed text-base md:text-lg">
-                Si buscas un acompañamiento técnico y honesto para construir comunicación con propósito, estaré encantada de escucharte y construir puentes narrativos.
+              <p className="text-foreground/75 font-light leading-relaxed text-base md:text-lg">
+                Si buscas un acompañamiento técnico y honesto para construir comunicación con propósito, estaré encantada de escucharte.
               </p>
             </div>
 
             <div className="space-y-4">
               <a 
                 href="mailto:angelamgomez@gmail.com" 
-                className="group flex items-center justify-between p-6 sm:p-8 border border-border/60 hover:border-primary hover:shadow-md transition-all duration-300 bg-white rounded-sm shadow-xs"
+                className="group flex items-center justify-between p-6 sm:p-7 border border-border/60 hover:border-primary hover:shadow-md transition-all duration-300 bg-white rounded-sm shadow-xs"
               >
                 <div className="flex items-center gap-5">
                   <div className="p-3 rounded-sm bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
@@ -213,7 +330,7 @@ export default function ContactPage() {
                 href={whatsappUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="group flex items-center justify-between p-6 sm:p-8 border border-border/60 hover:border-primary hover:shadow-md transition-all duration-300 bg-white rounded-sm shadow-xs"
+                className="group flex items-center justify-between p-6 sm:p-7 border border-border/60 hover:border-primary hover:shadow-md transition-all duration-300 bg-white rounded-sm shadow-xs"
               >
                 <div className="flex items-center gap-5">
                   <div className="p-3 rounded-sm bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
@@ -236,8 +353,8 @@ export default function ContactPage() {
               <a 
                 href="https://www.linkedin.com/in/angelamgomezd" 
                 target="_blank" 
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between p-6 sm:p-8 border border-border/60 hover:border-primary hover:shadow-md transition-all duration-300 bg-white rounded-sm shadow-xs"
+                rel="noopener noreferrer" 
+                className="group flex items-center justify-between p-6 sm:p-7 border border-border/60 hover:border-primary hover:shadow-md transition-all duration-300 bg-white rounded-sm shadow-xs"
               >
                 <div className="flex items-center gap-5">
                   <div className="p-3 rounded-sm bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
@@ -338,9 +455,11 @@ export default function ContactPage() {
             )}
           </div>
         </div>
+      </div>
 
-        {/* Footer Navigation Back to Home */}
-        <div className="flex justify-center pt-16 border-t border-border/50">
+      {/* Footer Navigation Back to Home */}
+      <div className="section-container pb-20">
+        <div className="flex justify-center pt-12 border-t border-border/50">
           <Link href="/" className="btn-editorial btn-editorial-outline group inline-flex items-center gap-4">
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             <span>Volver al Inicio</span>

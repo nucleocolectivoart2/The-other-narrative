@@ -48,59 +48,59 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen bg-background relative selection:bg-primary/30 overflow-x-hidden">
       
       {/* Hero Section */}
-      <section id="hero" className="relative h-screen w-full flex items-center overflow-hidden bg-black">
-        <div className="absolute inset-0 z-0">
+      <section id="hero" className="relative min-h-screen w-full flex flex-col justify-center overflow-hidden bg-black pt-20 sm:pt-24 pb-28 sm:pb-32">
+        <div className="absolute inset-0 z-0 overflow-hidden bg-zinc-950">
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none will-change-transform"
             style={{ 
               width: '100vw',
               height: '56.25vw', 
               minHeight: '100vh',
               minWidth: '177.77vh',
-              transform: `translate(-50%, calc(-50% + ${scrollY * 0.05}px))` 
             }}
           >
             <iframe
-              src="https://www.youtube.com/embed/0DmyalU2zL4?autoplay=1&mute=1&controls=0&loop=1&playlist=0DmyalU2zL4&start=12&end=114&background=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&enablejsapi=1"
-              className="absolute top-0 left-0 w-full h-full object-cover brightness-[0.35] grayscale-[0.2]"
-              allow="autoplay; encrypted-media"
-              frameBorder="0"
+              src="https://www.youtube-nocookie.com/embed/0DmyalU2zL4?autoplay=1&mute=1&controls=0&loop=1&playlist=0DmyalU2zL4&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&origin=https://ais-dev-u32u2sgirnzop3defgmbes-27258313979.us-east1.run.app"
+              className="absolute top-0 left-0 w-full h-full object-cover brightness-[0.38] grayscale-[0.15] scale-105 transition-opacity duration-1000"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="eager"
               title="Editorial Background Video"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/85 z-10 pointer-events-none" />
         </div>
 
         <div className="section-container relative z-20 w-full">
           <div className="max-w-5xl">
             
-            {/* Logo Arquitectónico Oficial (+50% Escala) */}
-            <div className="flex flex-col items-start mb-10 transition-all duration-1000">
-              <div className="relative w-full max-w-[510px] sm:max-w-[690px] md:max-w-[840px] h-40 sm:h-60 md:h-72">
+            {/* Logo Arquitectónico Oficial (+10% Escala, animado y con proporciones cinematográficas) */}
+            <div className="flex flex-col items-start mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out fill-mode-both">
+              <div className="relative w-full max-w-[460px] sm:max-w-[640px] md:max-w-[780px] lg:max-w-[850px] h-28 sm:h-40 md:h-52 lg:h-60">
                 <Image
                   src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/para%20fondo%20negro/logo_.png"
                   alt="The Other Narrative"
                   fill
                   priority
-                  className="object-contain object-left brightness-100 drop-shadow-lg"
+                  className="object-contain object-left brightness-100 drop-shadow-2xl"
                 />
               </div>
             </div>
 
-            {/* Mensajes de Valor */}
-            <div className="space-y-8 max-w-4xl transition-all duration-1000 delay-500">
-              <div className="flex flex-col gap-2">
-                <p className="text-xl md:text-2xl lg:text-3xl text-white font-bold tracking-tight uppercase leading-none">
+            {/* Mensajes de Valor (-15% a 20% más compactos y equilibrados) */}
+            <div className="space-y-4 sm:space-y-5 max-w-3xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300 ease-out fill-mode-both">
+              <div className="flex flex-col gap-1.5 sm:gap-2">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold tracking-tight uppercase leading-tight">
                   Narrativas que generan <span className="text-primary italic font-headline lowercase">confianza.</span>
                 </p>
-                <p className="text-xl md:text-2xl lg:text-3xl text-white font-bold tracking-tight uppercase leading-none">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold tracking-tight uppercase leading-tight">
                   Estrategias que movilizan <span className="text-primary italic font-headline lowercase">personas.</span>
                 </p>
               </div>
 
               {/* Bloque de Propósito Editorial */}
-              <div className="border-l-2 border-primary/40 max-w-2xl mt-12 pl-8 py-2">
-                <p className="text-base sm:text-lg md:text-xl text-white/80 font-light leading-relaxed">
+              <div className="border-l-2 border-primary/40 max-w-xl mt-4 sm:mt-5 pl-5 py-1">
+                <p className="text-xs sm:text-sm md:text-[15px] text-white/80 font-light leading-relaxed">
                   En un entorno saturado, ayudamos a organizaciones a transformar conocimiento, propósito y estrategia en narrativas capaces de generar comprensión, participación y acción.
                 </p>
               </div>
@@ -108,9 +108,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Action Bar Inferior - Equilibrada */}
-        <div className="absolute bottom-0 left-0 w-full bg-black/40 backdrop-blur-md border-t border-white/5 py-6 sm:py-8 z-40 transition-all duration-1000 delay-700">
-          <div className="section-container flex flex-col sm:flex-row items-center justify-between gap-6">
+        {/* Action Bar Inferior - Equilibrada sin tapar el contenido */}
+        <div className="absolute bottom-0 left-0 w-full bg-black/40 backdrop-blur-md border-t border-white/5 py-4 sm:py-6 z-40 transition-all duration-1000 delay-700">
+          <div className="section-container flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex gap-4">
               <Link 
                 href="/blog" 

@@ -52,14 +52,26 @@ export function Navbar() {
             href="/" 
             className="relative z-[70] flex items-center h-8 sm:h-9 w-36 sm:w-48 transition-all duration-500 hover:opacity-90"
           >
+            {/* White Logo (for dark background) */}
             <Image
               src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/para%20fondo%20negro/Recurso%2021.png"
               alt="The Other Narrative"
               fill
               priority
               className={cn(
-                "object-contain object-left transition-all duration-500",
-                isLightNav ? "invert brightness-0" : "brightness-100"
+                "object-contain object-left transition-opacity duration-500",
+                isLightNav ? "opacity-0 pointer-events-none" : "opacity-100"
+              )}
+            />
+            {/* Dark Logo (logo7.png for white navbar) */}
+            <Image
+              src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/logo7.png"
+              alt="The Other Narrative"
+              fill
+              priority
+              className={cn(
+                "object-contain object-left transition-opacity duration-500",
+                isLightNav ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
             />
           </Link>
