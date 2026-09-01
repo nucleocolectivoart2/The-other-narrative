@@ -36,24 +36,24 @@ export default function ExperienciaPage() {
   return (
     <div className="bg-background min-h-screen">
       {/* Banner Principal */}
-      <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-black">
+      <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-white">
         <div className="absolute inset-0 z-0">
           <Image
             src={bannerImage?.imageUrl || estrategiaImg}
             alt="Áreas de Trabajo"
             fill
-            className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
+            className="object-cover opacity-95 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
             priority
           />
         </div>
-        <div className="section-container relative z-10 w-full text-white">
+        <div className="section-container relative z-10 w-full text-foreground">
           <span className="text-primary font-bold tracking-[0.5em] uppercase text-[9px] sm:text-[10px] mb-6 sm:mb-8 block animate-in slide-in-from-bottom-4 duration-700">Capítulo 02</span>
           <div className="max-w-4xl animate-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-6 sm:mb-8 tracking-tighter text-white">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-6 sm:mb-8 tracking-tighter text-foreground">
               Áreas de <br />
               <span className="italic font-normal text-primary">Trabajo.</span>
             </h1>
-            <p className="text-lg sm:text-xl md:text-2xl font-light text-white/70 leading-relaxed max-w-2xl italic">
+            <p className="text-lg sm:text-xl md:text-2xl font-light text-foreground/80 leading-relaxed max-w-2xl italic">
               Transformamos conocimiento, propósito y estrategia en productos de valor.
             </p>
           </div>

@@ -23,17 +23,17 @@ export default function ProyectosPage() {
       category: 'Regeneración',
       description: 'Construcción de la narrativa estratégica para el Hub de Comunicación Responsable durante la cumbre de biodiversidad más importante del mundo.',
       image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/03.png',
-      link: '#',
+      link: '/multimedia',
       ods: [16, 17, 10]
     },
     {
       id: 'mock-p2',
-      title: 'Narrativas para el Pacto Global',
-      category: 'Estrategia',
-      description: 'Refinamiento editorial y construcción de mensajes clave para la Red Colombia del Pacto Global de las Naciones Unidas.',
+      title: 'Laboratorio de Narrativas & Archivo Vivo',
+      category: 'Ecosistema Transmedia',
+      description: 'Diseño de infraestructuras narrativas, laboratorios transmedia y espacios de aprendizaje colaborativo para articular diálogos de impacto, territorio e inteligencia colectiva.',
       image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/05.png',
-      link: '#',
-      ods: [17, 4, 16]
+      link: '/multimedia',
+      ods: [4, 11, 16, 17]
     }
   ];
 
@@ -41,22 +41,22 @@ export default function ProyectosPage() {
 
   return (
     <main className="bg-background min-h-screen">
-      <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-black">
+      <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-white">
         <div className="absolute inset-0 z-0">
           <Image
             src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_03%20proyectos.png'}
             alt="Proyectos"
             fill
-            className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
+            className="object-cover opacity-95 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
             priority
           />
         </div>
-        <div className="section-container relative z-10 w-full text-white">
+        <div className="section-container relative z-10 w-full text-foreground">
           <span className="text-primary font-bold tracking-[0.6em] uppercase text-[9px] sm:text-[10px] mb-6 sm:mb-8 block animate-in slide-in-from-bottom-4 duration-700">
             Portafolio Técnico
           </span>
           <div className="max-w-4xl animate-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-6 sm:mb-8 tracking-tighter text-white">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-6 sm:mb-8 tracking-tighter text-foreground">
               Casos en <br />
               <span className="italic font-normal text-primary">Acción.</span>
             </h1>
@@ -124,10 +124,11 @@ export default function ProyectosPage() {
                     {project.link && (
                       <Link 
                         href={project.link} 
-                        target="_blank" 
-                        className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-3 hover:gap-5 transition-all"
+                        target={project.link.startsWith('http') ? "_blank" : undefined}
+                        rel={project.link.startsWith('http') ? "noopener noreferrer" : undefined}
+                        className="inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-all group/btn"
                       >
-                        VER DETALLES <ExternalLink className="h-3 w-3" />
+                        EXPLORAR MULTIMEDIA {project.link.startsWith('http') ? <ExternalLink className="h-3 w-3" /> : <ArrowRight className="h-3.5 w-3.5 group-hover/btn:translate-x-1.5 transition-transform" />}
                       </Link>
                     )}
                   </div>

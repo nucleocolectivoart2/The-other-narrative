@@ -74,28 +74,16 @@ export default function HomePage() {
         <div className="section-container relative z-20 w-full">
           <div className="max-w-5xl">
             
-            {/* Logo Arquitectónico Estable */}
+            {/* Logo Arquitectónico Oficial (+50% Escala) */}
             <div className="flex flex-col items-start mb-10 transition-all duration-1000">
-              <div className="flex flex-col -space-y-2 md:-space-y-4">
-                <h1 className="text-6xl sm:text-8xl md:text-[110px] lg:text-[140px] font-bold font-headline leading-[0.85] text-white tracking-tighter lowercase">
-                  the
-                </h1>
-                <h1 className="text-6xl sm:text-8xl md:text-[110px] lg:text-[140px] font-bold font-headline leading-[0.85] text-white tracking-tighter lowercase">
-                  other
-                </h1>
-                <h1 className="text-6xl sm:text-8xl md:text-[110px] lg:text-[140px] font-normal font-headline leading-[0.85] text-primary italic tracking-tighter lowercase">
-                  narrative.
-                </h1>
-              </div>
-            </div>
-
-            {/* Editorial Label Refinado */}
-            <div className="mb-12 transition-all duration-1000 delay-300">
-              <div className="inline-flex items-center gap-4 py-2 border-y border-white/10">
-                <span className="text-primary font-bold text-[9px] sm:text-[10px] tracking-[0.4em] uppercase">
-                  Laboratorio Estratégico y Editorial
-                </span>
-                <div className="h-px w-12 bg-primary/40 hidden sm:block" />
+              <div className="relative w-full max-w-[510px] sm:max-w-[690px] md:max-w-[840px] h-40 sm:h-60 md:h-72">
+                <Image
+                  src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/para%20fondo%20negro/logo_.png"
+                  alt="The Other Narrative"
+                  fill
+                  priority
+                  className="object-contain object-left brightness-100 drop-shadow-lg"
+                />
               </div>
             </div>
 

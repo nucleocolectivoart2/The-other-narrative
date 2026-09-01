@@ -59,32 +59,32 @@ export default function ArticleDetailPage() {
 
   return (
     <main className="bg-background min-h-screen pb-24 sm:pb-32">
-      <section className="relative h-[70vh] sm:h-[80vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden bg-black">
+      <section className="relative h-[70vh] sm:h-[80vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden bg-white border-b">
         <div className="absolute inset-0 z-0">
           <Image
             src={article?.image || defaultImage}
             alt={article?.title || ''}
             fill
-            className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
+            className="object-cover opacity-90 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
             priority
           />
         </div>
-        <div className="section-container relative z-10 w-full text-white">
+        <div className="section-container relative z-10 w-full text-foreground">
           <div className="max-w-4xl space-y-6 sm:space-y-8 animate-in slide-in-from-bottom-8 duration-1000">
             <div>
-              <span className="bg-primary text-white text-[8px] sm:text-[9px] font-bold px-3 sm:px-4 py-2 uppercase tracking-[0.4em] inline-block shadow-2xl">
+              <span className="bg-primary text-white text-[8px] sm:text-[9px] font-bold px-3 sm:px-4 py-2 uppercase tracking-[0.4em] inline-block shadow-md">
                 {article?.type}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] tracking-tighter text-white">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] tracking-tighter text-foreground">
               {article?.title}
             </h1>
-            <div className="flex flex-wrap gap-4 sm:gap-8 pt-4 text-white/60 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">
+            <div className="flex flex-wrap gap-4 sm:gap-8 pt-4 text-foreground/75 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">
                <div className="flex items-center gap-3">
                  <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" /> 
                  <div className="flex flex-col">
                    <span>{article?.authorName || 'Ángela Gómez'}</span>
-                   <span className="opacity-50 text-[7px] sm:text-[8px] tracking-widest lowercase italic">{article?.authorTitle || 'Periodista en Regeneración'}</span>
+                   <span className="opacity-60 text-[7px] sm:text-[8px] tracking-widest lowercase italic">{article?.authorTitle || 'Periodista en Regeneración'}</span>
                  </div>
                </div>
                <div className="flex items-center gap-3">
@@ -95,7 +95,6 @@ export default function ArticleDetailPage() {
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-[5]" />
       </section>
 
       <article className="section-container py-16 sm:py-24">

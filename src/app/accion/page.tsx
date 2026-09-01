@@ -11,20 +11,20 @@ export default function AccionPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <section className="relative h-[70vh] w-full flex items-end pb-24 overflow-hidden border-b bg-black">
+      <section className="relative h-[70vh] w-full flex items-end pb-24 overflow-hidden border-b bg-white">
         <div className="absolute inset-0 z-0">
           <Image
             src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/13%20Pensemos%20en%20Regeneracion.png'}
             alt="Proceso y Regeneración"
             fill
-            className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
+            className="object-cover opacity-95 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
             priority
           />
         </div>
-        <div className="section-container relative z-10 w-full text-white">
+        <div className="section-container relative z-10 w-full text-foreground">
           <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-8 block animate-in slide-in-from-bottom-4 duration-700">Capítulo 03</span>
           <div className="max-w-4xl animate-in slide-in-from-bottom-8 duration-1000">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-8 tracking-tighter text-white">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-8 tracking-tighter text-foreground">
               Regeneración <br />
               <span className="italic font-normal text-primary">& Proceso.</span>
             </h1>

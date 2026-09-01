@@ -48,26 +48,26 @@ export default function BlogPage() {
 
   return (
     <main className="bg-background min-h-screen">
-      <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-black">
+      <section className="relative h-[60vh] sm:h-[70vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden border-b bg-white">
         <div className="absolute inset-0 z-0">
           <Image
             src={bannerImage?.imageUrl || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/banners/banners_04%20blog.png'}
             alt="Bitácora Header"
             fill
-            className="object-cover opacity-75 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
+            className="object-cover opacity-95 transition-all duration-[5000ms] animate-in fade-in zoom-in-110"
             priority
           />
         </div>
-        <div className="section-container relative z-10 w-full text-white">
+        <div className="section-container relative z-10 w-full text-foreground">
           <span className="text-primary font-bold tracking-[0.6em] uppercase text-[9px] sm:text-[10px] mb-6 sm:mb-8 block animate-in slide-in-from-bottom-4 duration-700">
             Escrituras Compartidas
           </span>
           <div className="max-w-4xl animate-in slide-in-from-bottom-8 duration-1000 delay-200">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-6 sm:mb-8 tracking-tighter text-white">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-headline leading-[0.9] mb-6 sm:mb-8 tracking-tighter text-foreground">
               Bitácora <br />
               <span className="italic font-normal text-primary">Abierta.</span>
             </h1>
-            <p className="text-lg sm:text-xl md:text-2xl font-light text-white/70 leading-relaxed max-w-2xl">
+            <p className="text-lg sm:text-xl md:text-2xl font-light text-foreground/80 leading-relaxed max-w-2xl">
               Un espacio para compartir ideas, investigaciones, entrevistas y aprendizajes sobre comunicación, regeneración, liderazgo y construcción de confianza.
             </p>
           </div>

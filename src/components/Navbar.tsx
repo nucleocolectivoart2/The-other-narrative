@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -16,6 +18,8 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +37,8 @@ export function Navbar() {
     }
   }, [isOpen]);
 
+  const isLightNav = scrolled || isOpen || !isHomePage;
+
   return (
     <>
       <header className={cn(
@@ -44,12 +50,18 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link 
             href="/" 
-            className={cn(
-              "text-base sm:text-lg font-bold font-headline tracking-tighter lowercase z-[70] transition-colors duration-500",
-              scrolled || isOpen ? "text-foreground" : "text-white"
-            )}
+            className="relative z-[70] flex items-center h-8 sm:h-9 w-36 sm:w-48 transition-all duration-500 hover:opacity-90"
           >
-            the other narrative.
+            <Image
+              src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/para%20fondo%20negro/Recurso%2021.png"
+              alt="The Other Narrative"
+              fill
+              priority
+              className={cn(
+                "object-contain object-left transition-all duration-500",
+                isLightNav ? "invert brightness-0" : "brightness-100"
+              )}
+            />
           </Link>
           
           <div className="flex items-center space-x-2 sm:space-x-8">
@@ -61,7 +73,7 @@ export function Navbar() {
                       href={link.href}
                       className={cn(
                         "text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase transition-all duration-500 hover:text-primary",
-                        scrolled ? "text-foreground/60" : "text-white/80"
+                        isLightNav ? "text-foreground/75 hover:text-primary" : "text-white/80 hover:text-white"
                       )}
                     >
                       {link.name}
@@ -79,15 +91,15 @@ export function Navbar() {
               <div className="relative w-5 h-4 flex flex-col justify-between items-end">
                 <span className={cn(
                   "h-[1.5px] transition-all duration-500 ease-in-out",
-                  isOpen ? "w-5 absolute top-1/2 -rotate-45 bg-foreground" : cn("w-5", scrolled ? "bg-foreground" : "bg-white")
+                  isOpen ? "w-5 absolute top-1/2 -rotate-45 bg-foreground" : cn("w-5", isLightNav ? "bg-foreground" : "bg-white")
                 )} />
                 <span className={cn(
                   "h-[1.5px] transition-all duration-300 ease-in-out",
-                  isOpen ? "opacity-0 w-0 bg-foreground" : cn("w-3", scrolled ? "bg-foreground" : "bg-white")
+                  isOpen ? "opacity-0 w-0 bg-foreground" : cn("w-3", isLightNav ? "bg-foreground" : "bg-white")
                 )} />
                 <span className={cn(
                   "h-[1.5px] transition-all duration-500 ease-in-out",
-                  isOpen ? "w-5 absolute top-1/2 rotate-45 bg-foreground" : cn("w-1", scrolled ? "bg-foreground" : "bg-white")
+                  isOpen ? "w-5 absolute top-1/2 rotate-45 bg-foreground" : cn("w-1", isLightNav ? "bg-foreground" : "bg-white")
                 )} />
               </div>
             </button>
