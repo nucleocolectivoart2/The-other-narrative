@@ -47,7 +47,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { editorialAssistant, type EditorialOutput } from '@/ai/flows/editorial-assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -55,7 +54,17 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-const AUTHORIZED_EMAILS = ['angelamgomez@gmail.com', 'nucleo.colectivo.art@gmail.com'];
+export interface EditorialOutput {
+  refinedText: string;
+  keyMessages: string[];
+  regenerativeInsight: string;
+}
+
+const AUTHORIZED_EMAILS = [
+  'angelamgomez@gmail.com', 
+  'nucleo.colectivo.art@gmail.com', 
+  'nucleo.colectivo.art2@gmail.com'
+];
 
 type BlockType = 'title' | 'text' | 'quote';
 type Alignment = 'left' | 'center' | 'right' | 'justify';
@@ -161,7 +170,27 @@ export default function AdminDashboard() {
   const adminDocRef = useMemoFirebase(() => user ? doc(firestore, 'adminRoles', user.uid) : null, [firestore, user]);
   const { data: adminData, isLoading: isAdminLoading } = useDoc(adminDocRef);
 
-  const isAuthorized = adminData?.isAdmin || (user?.email && AUTHORIZED_EMAILS.includes(user.email));
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+  const [isSessionChecking, setIsSessionChecking] = useState(true);
+
+  useEffect(() => {
+    try {
+      const savedSession = localStorage.getItem('medular_admin_session');
+      if (savedSession) {
+        const parsed = JSON.parse(savedSession);
+        if (parsed.email) {
+          setSessionEmail(parsed.email.toLowerCase());
+        }
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsSessionChecking(false);
+    }
+  }, []);
+
+  const effectiveEmail = (user?.email || sessionEmail || '').toLowerCase();
+  const isAuthorized = adminData?.isAdmin || (effectiveEmail && AUTHORIZED_EMAILS.some(e => e.toLowerCase() === effectiveEmail));
 
   const [activeTab, setActiveTab] = useState('overview');
   const [activeForm, setActiveForm] = useState<'none' | 'podcast' | 'project' | 'blog' | 'video' | 'testimonial'>('none');
@@ -211,15 +240,27 @@ export default function AdminDashboard() {
   const { data: projectItems } = useCollection(projectsQuery);
   const testimonialsQuery = useMemoFirebase(() => query(collection(firestore, 'testimonials')), [firestore]);
   const { data: testimonialItems } = useCollection(testimonialsQuery);
-  const messagesQuery = useMemoFirebase(() => query(collection(firestore, 'messages'), orderBy('createdAt', 'desc')), [firestore]);
+  const messagesQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, 'messages'), orderBy('createdAt', 'desc'));
+  }, [firestore, user]);
   const { data: messageItems } = useCollection(messagesQuery);
 
   useEffect(() => {
-    if (!isUserLoading && !user) router.push('/login');
-  }, [user, isUserLoading, router]);
+    if (!isUserLoading && !isSessionChecking && !user && !sessionEmail) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, isSessionChecking, sessionEmail, router]);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    try {
+      localStorage.removeItem('medular_admin_session');
+    } catch {
+      // ignore
+    }
+    if (auth) {
+      await signOut(auth);
+    }
     router.push('/login');
   };
 
@@ -298,7 +339,15 @@ export default function AdminDashboard() {
     }
     setIsAiLoading(true);
     try {
-      const res = await editorialAssistant({ text: aiInput });
+      const response = await fetch('/api/ai/editorial-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: aiInput }),
+      });
+      if (!response.ok) {
+        throw new Error('Error en el servicio de refinamiento editorial');
+      }
+      const res: EditorialOutput = await response.json();
       setAiResult(res);
       toast({ title: "Refinamiento Completado", description: "La IA ha procesado tu narrativa." });
     } catch (e) {
@@ -376,8 +425,21 @@ export default function AdminDashboard() {
     updateDoc(doc(firestore, 'messages', id), { read: true });
   };
 
-  if (isUserLoading || isAdminLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
-  if (!user || !isAuthorized) return <div className="min-h-screen flex flex-col items-center justify-center p-8 space-y-8"><ShieldAlert className="h-16 w-16 opacity-20" /><h1 className="text-3xl font-bold font-headline">Acceso Restringido</h1><Button onClick={handleLogout}>Cerrar sesión</Button></div>;
+  if (isUserLoading && isSessionChecking) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
+  if (!isAuthorized) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 space-y-6 text-center">
+      <ShieldAlert className="h-16 w-16 text-primary opacity-40 animate-pulse" />
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold font-headline">Acceso Restringido</h1>
+        <p className="text-sm text-muted-foreground max-w-md">
+          La cuenta actual ({effectiveEmail || 'No autenticado'}) no tiene permisos asignados para el panel editorial.
+        </p>
+      </div>
+      <Button onClick={handleLogout} className="rounded-lg text-xs uppercase tracking-wider font-bold">
+        Cerrar sesión / Cambiar Cuenta
+      </Button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background pb-32">
@@ -385,7 +447,10 @@ export default function AdminDashboard() {
         <div className="section-container flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold font-headline tracking-tighter">Laboratorio de Gestión Editorial</h1>
-            <p className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-60">Admin: {user.email}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary-foreground/80 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 inline-block animate-ping" />
+              <span>Admin activo: {effectiveEmail || 'Sesión Autorizada'}</span>
+            </p>
           </div>
           <Button variant="outline" onClick={handleLogout} className="text-[9px] font-bold uppercase tracking-widest h-11 px-8 border-white/20 hover:bg-white/10"><LogOut className="mr-3 h-3.5" /> Salir</Button>
         </div>

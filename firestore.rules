@@ -1,7 +1,7 @@
 
 /**
  * FIREBASE SECURITY RULES - THE OTHER NARRATIVE
- * DEPLOYMENT TRIGGER: V16 - Contact Messages Authorization
+ * DEPLOYMENT TRIGGER: V17 - Authorized Team Emails and Messages Security
  */
 
 rules_version = '2';
@@ -18,7 +18,8 @@ service cloud.firestore {
     function isAuthorizedEmail() {
       return isSignedIn() && (
         request.auth.token.email == 'angelamgomez@gmail.com' || 
-        request.auth.token.email == 'nucleo.colectivo.art@gmail.com'
+        request.auth.token.email == 'nucleo.colectivo.art@gmail.com' ||
+        request.auth.token.email == 'nucleo.colectivo.art2@gmail.com'
       );
     }
 

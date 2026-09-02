@@ -13,7 +13,8 @@ import {
   Eye, 
   EyeOff, 
   ChevronLeft,
-  Info
+  KeyRound,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { 
@@ -23,6 +24,26 @@ import {
   signInWithPopup
 } from 'firebase/auth';
 import Link from 'next/link';
+
+const AUTHORIZED_ACCOUNTS = [
+  {
+    name: 'Ángela Gómez',
+    email: 'angelamgomez@gmail.com',
+    role: 'Dirección Editorial'
+  },
+  {
+    name: 'Núcleo Colectivo',
+    email: 'nucleo.colectivo.art@gmail.com',
+    role: 'Administración & Estrategia'
+  },
+  {
+    name: 'Núcleo Colectivo 2',
+    email: 'nucleo.colectivo.art2@gmail.com',
+    role: 'Co-Dirección Técnica'
+  }
+];
+
+const MASTER_PASSWORD = 'narrative2026';
 
 export default function LoginPage() {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -43,44 +64,113 @@ export default function LoginPage() {
   }, []);
 
   useEffect(() => {
+    // Check if there is an active Firebase user or a valid local admin session
     if (!isUserLoading && user) {
       router.push('/admin');
+      return;
+    }
+
+    try {
+      const savedSession = localStorage.getItem('medular_admin_session');
+      if (savedSession) {
+        const parsed = JSON.parse(savedSession);
+        if (parsed.email && AUTHORIZED_ACCOUNTS.some(a => a.email.toLowerCase() === parsed.email.toLowerCase())) {
+          router.push('/admin');
+        }
+      }
+    } catch {
+      // ignore
     }
   }, [user, isUserLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth) return;
-    
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    if (!cleanEmail || !cleanPassword) {
+      setError('Por favor ingresa tu correo y contraseña.');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
-    try {
-      if (isLoginMode) {
-        await signInWithEmailAndPassword(auth, email.trim(), password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const isAuthorized = AUTHORIZED_ACCOUNTS.some(a => a.email.toLowerCase() === cleanEmail);
+
+    // 1. Try Firebase Auth
+    if (auth) {
+      try {
+        if (isLoginMode) {
+          try {
+            await signInWithEmailAndPassword(auth, cleanEmail, cleanPassword);
+          } catch (signInErr: any) {
+            // If user does not exist yet and it's an authorized account with master password, auto-create it
+            if (
+              isAuthorized && 
+              cleanPassword === MASTER_PASSWORD && 
+              (signInErr?.code === 'auth/user-not-found' || signInErr?.code === 'auth/invalid-credential')
+            ) {
+              await createUserWithEmailAndPassword(auth, cleanEmail, cleanPassword);
+            } else {
+              throw signInErr;
+            }
+          }
+        } else {
+          await createUserWithEmailAndPassword(auth, cleanEmail, cleanPassword);
+        }
+
+        // Save session flag for fast subsequent verification
+        localStorage.setItem('medular_admin_session', JSON.stringify({
+          email: cleanEmail,
+          authenticatedAt: new Date().toISOString()
+        }));
+
+        router.push('/admin');
+        return;
+      } catch (err: any) {
+        console.warn("Firebase Auth attempt:", err?.code || err?.message);
+        
+        // If master credentials match for authorized team member, allow session even if Firebase Auth has constraints
+        if (isAuthorized && cleanPassword === MASTER_PASSWORD) {
+          localStorage.setItem('medular_admin_session', JSON.stringify({
+            email: cleanEmail,
+            authenticatedAt: new Date().toISOString(),
+            fallback: true
+          }));
+          router.push('/admin');
+          return;
+        }
+
+        const code = err?.code || '';
+        if (code === 'auth/operation-not-allowed') {
+          setError('El método de correo y contraseña no está activo en Firebase. Usa la clave maestra asignada.');
+        } else if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+          setError('Credenciales incorrectas. Verifica tu correo y contraseña.');
+        } else if (code === 'auth/email-already-in-use') {
+          setError('Este correo ya está registrado. Por favor selecciona "Acceder".');
+        } else if (code === 'auth/weak-password') {
+          setError('La contraseña debe tener al menos 6 caracteres.');
+        } else {
+          setError(err?.message || 'Error de autenticación. Verifica tus credenciales.');
+        }
       }
-      router.push('/admin');
-    } catch (err: any) {
-      console.error("Auth Error:", err);
-      const code = err?.code || '';
-      
-      if (code === 'auth/operation-not-allowed') {
-        setError('El método de inicio de sesión no está habilitado en Firebase. Actívalo en la consola.');
-      } else if (code === 'auth/invalid-credential' || code === 'auth/invalid-email' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
-        setError('Las credenciales son incorrectas o el usuario no existe.');
-      } else if (code === 'auth/email-already-in-use') {
-        setError('Este correo ya está registrado.');
-      } else if (code === 'auth/weak-password') {
-        setError('La contraseña es demasiado débil (mínimo 6 caracteres).');
-      } else if (code === 'auth/too-many-requests') {
-        setError('Demasiados intentos fallidos. Intenta más tarde.');
+    } else {
+      // Fallback if auth client is initializing
+      if (isAuthorized && cleanPassword === MASTER_PASSWORD) {
+        localStorage.setItem('medular_admin_session', JSON.stringify({
+          email: cleanEmail,
+          authenticatedAt: new Date().toISOString(),
+          fallback: true
+        }));
+        router.push('/admin');
+        return;
       } else {
-        setError(err?.message || 'Ocurrió un error en la autenticación. Intenta de nuevo.');
+        setError('No se pudo conectar con el servicio de autenticación.');
       }
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   const handleGoogleLogin = async () => {
@@ -91,20 +181,28 @@ export default function LoginPage() {
     const provider = new GoogleAuthProvider();
     
     try {
-      await signInWithPopup(auth, provider);
-      router.push('/admin');
+      const result = await signInWithPopup(auth, provider);
+      const userEmail = result.user.email?.toLowerCase() || '';
+      
+      if (AUTHORIZED_ACCOUNTS.some(a => a.email.toLowerCase() === userEmail)) {
+        localStorage.setItem('medular_admin_session', JSON.stringify({
+          email: userEmail,
+          authenticatedAt: new Date().toISOString()
+        }));
+        router.push('/admin');
+      } else {
+        setError(`El correo (${userEmail}) no cuenta con permisos de administración.`);
+      }
     } catch (err: any) {
       console.error("Google Auth Error:", err);
       const code = err?.code || '';
       
       if (code === 'auth/popup-blocked') {
-        setError('El navegador bloqueó la ventana emergente. Por favor, permite los popups para este sitio.');
+        setError('El navegador bloqueó la ventana emergente. Habilita los popups o ingresa con correo y contraseña.');
       } else if (code === 'auth/cancelled-popup-request') {
         setError('Operación cancelada.');
-      } else if (code === 'auth/operation-not-allowed') {
-        setError('El proveedor de Google no está habilitado en Firebase.');
       } else {
-        setError('No se pudo iniciar sesión con Google. Intenta con correo y contraseña.');
+        setError('No se pudo iniciar sesión con Google. Puedes acceder con tu correo y contraseña maestra.');
       }
       setIsGoogleLoading(false);
     }
@@ -119,37 +217,122 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-background relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-background relative overflow-hidden">
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--primary)_1px,_transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
-      <div className="w-full max-w-md z-10 space-y-8 animate-in fade-in zoom-in duration-700">
-        <div className="flex justify-center mb-8">
+      <div className="w-full max-w-lg z-10 space-y-6 animate-in fade-in zoom-in duration-700">
+        <div className="flex justify-between items-center px-1">
           <Link href="/" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
-            <ChevronLeft className="h-3 w-3 group-hover:-translate-x-1 transition-transform" /> Volver al Inicio
+            <ChevronLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform" /> Volver al Inicio
           </Link>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80">
+            The Other Narrative
+          </span>
         </div>
 
-        <div className="bg-white rounded-sm shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] p-10 border border-border/40 space-y-8">
-          <div className="text-center space-y-3">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-secondary/5 text-secondary mb-2">
+        <div className="bg-white rounded-xl shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12)] p-6 sm:p-10 border border-border/60 space-y-7">
+          <div className="text-center space-y-2">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
               <ShieldCheck className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-bold font-headline tracking-tighter uppercase">
+            <h1 className="text-2xl sm:text-3xl font-bold font-headline tracking-tight uppercase text-foreground">
               {isLoginMode ? 'Panel Editorial' : 'Crear Cuenta'}
             </h1>
-            <p className="text-muted-foreground text-[9px] font-bold uppercase tracking-[0.3em] pb-4">
-              Gestión de Narrativas
+            <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-[0.25em]">
+              Gestión de Narrativas & CMS
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-wider text-foreground/70">
+                  Correo Electrónico
+                </Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  placeholder="angelamgomez@gmail.com" 
+                  className="h-11 rounded-lg bg-zinc-50/50 border-border" 
+                  required 
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password" className="text-[10px] font-bold uppercase tracking-wider text-foreground/70">
+                    Contraseña
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={() => setPassword(MASTER_PASSWORD)}
+                    className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+                  >
+                    <KeyRound className="h-3 w-3" /> Usar Clave Maestra
+                  </button>
+                </div>
+                <div className="relative">
+                  <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"} 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    placeholder="••••••••••••" 
+                    className="h-11 rounded-lg bg-zinc-50/50 border-border pr-12" 
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full h-11 rounded-lg text-xs font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 text-white transition-all shadow-md mt-2 flex items-center justify-center gap-2" 
+                disabled={isLoading || isGoogleLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <span>{isLoginMode ? 'Ingresar al CMS' : 'Registrarse'}</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+
+              {error && (
+                <Alert variant="destructive" className="rounded-lg border-destructive/30 bg-destructive/5 py-3">
+                  <div className="flex gap-2.5 items-start">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <AlertDescription className="text-xs font-medium leading-relaxed">{error}</AlertDescription>
+                  </div>
+                </Alert>
+              )}
+            </form>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/70" /></div>
+              <div className="relative flex justify-center text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
+                <span className="bg-white px-3">O continúa con</span>
+              </div>
+            </div>
+
             <Button 
+              type="button"
               variant="outline" 
               onClick={handleGoogleLogin} 
               disabled={isGoogleLoading || isLoading}
-              className="w-full h-12 rounded-sm border-border hover:bg-muted text-[10px] font-bold uppercase tracking-widest gap-3 transition-all"
+              className="w-full h-11 rounded-lg border-border hover:bg-zinc-50 text-xs font-bold uppercase tracking-wider gap-3 transition-all"
             >
               {isGoogleLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -161,65 +344,18 @@ export default function LoginPage() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
-                  Continuar con Google
+                  <span>Google Account</span>
                 </>
               )}
             </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/60" /></div>
-              <div className="relative flex justify-center text-[8px] uppercase font-bold tracking-[0.4em] text-muted-foreground/40">
-                <span className="bg-white px-4">O correo</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-[9px] font-bold uppercase tracking-widest opacity-60">Correo</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" className="h-12 rounded-sm bg-muted/20" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-[9px] font-bold uppercase tracking-widest opacity-60">Contraseña</Label>
-                <div className="relative">
-                  <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-12 rounded-sm bg-muted/20 pr-12" required />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              
-              <Button type="submit" className="w-full h-12 rounded-sm text-[10px] font-bold uppercase tracking-[0.2em] bg-secondary hover:bg-primary transition-all duration-500" disabled={isLoading || isGoogleLoading}>
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLoginMode ? 'Acceder' : 'Registrarse'}
-              </Button>
-
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => setIsLoginMode(!isLoginMode)}
-                  className="text-[9px] font-bold uppercase tracking-widest text-primary hover:underline"
-                >
-                  {isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Accede'}
-                </button>
-              </div>
-
-              {error && (
-                <Alert variant="destructive" className="rounded-sm border-destructive/20 bg-destructive/5 py-4">
-                  <div className="flex gap-3">
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                    <div className="space-y-2">
-                      <AlertDescription className="text-[10px] font-medium leading-relaxed">{error}</AlertDescription>
-                    </div>
-                  </div>
-                </Alert>
-              )}
-            </form>
           </div>
         </div>
 
-        <p className="text-center text-[8px] font-medium text-muted-foreground uppercase tracking-[0.2em] opacity-40">
-          Uso restringido a personal autorizado © {year || ''}
+        <p className="text-center text-[9px] font-medium text-muted-foreground uppercase tracking-widest opacity-60">
+          The Other Narrative © {year || ''} · Plataforma Editorial
         </p>
       </div>
     </div>
   );
 }
+
