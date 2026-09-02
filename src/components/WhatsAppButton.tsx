@@ -3,10 +3,12 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export function WhatsAppButton() {
-  const phoneNumber = "573162809797";
-  const message = encodeURIComponent("Hola Ángela, vi tu bitácora y me gustaría conversar sobre regeneración y comunicación.");
+  const { settings } = useSiteSettings();
+  const phoneNumber = settings.whatsappNumber || "573162809797";
+  const message = encodeURIComponent(settings.whatsappMessage || "Hola Ángela, vi tu bitácora y me gustaría conversar sobre regeneración y comunicación.");
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
 
   return (

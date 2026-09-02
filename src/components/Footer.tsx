@@ -5,9 +5,11 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Linkedin, Radio } from 'lucide-react';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 export function Footer() {
   const [year, setYear] = useState<number | null>(null);
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     setYear(new Date().getFullYear());
@@ -30,18 +32,43 @@ export function Footer() {
               />
             </Link>
             <p className="text-xs md:text-sm font-bold uppercase tracking-[0.3em] text-primary">
-              Narrativas. Confianza. Participación. Impacto.
+              {settings.footerMotto || "Narrativas. Confianza. Participación. Impacto."}
             </p>
             <p className="text-base font-light text-white/40 leading-relaxed max-w-sm">
-              Laboratorio estratégico y editorial que ayuda a transformar conocimiento, propósito y estrategia en narrativas capaces de generar comprensión y acción.
+              {settings.footerDescription || "Laboratorio estratégico y editorial que ayuda a transformar conocimiento, propósito y estrategia en narrativas capaces de generar comprensión y acción."}
             </p>
             <div className="flex gap-6 pt-2">
-              <a href="https://www.linkedin.com/in/angelamgomezd/?skipRedirect=true" target="_blank" rel="noopener noreferrer" className="h-10 w-10 border border-white/10 flex items-center justify-center hover:bg-primary transition-all">
-                <Linkedin className="h-4 w-4" />
-              </a>
-              <a href="https://open.spotify.com/show/4fIwE8OUNlJkszY6XQZcO5" target="_blank" rel="noopener noreferrer" className="h-10 w-10 border border-white/10 flex items-center justify-center hover:bg-primary transition-all">
-                <Radio className="h-4 w-4" />
-              </a>
+              {settings.linkedinUrl && (
+                <a 
+                  href={settings.linkedinUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="h-10 w-10 border border-white/10 flex items-center justify-center hover:bg-primary transition-all"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="h-4 w-4" />
+                </a>
+              )}
+              {settings.spotifyUrl && (
+                <a 
+                  href={settings.spotifyUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="h-10 w-10 border border-white/10 flex items-center justify-center hover:bg-primary transition-all"
+                  aria-label="Spotify Podcast"
+                >
+                  <Radio className="h-4 w-4" />
+                </a>
+              )}
+              {settings.contactEmail && (
+                <a 
+                  href={`mailto:${settings.contactEmail}`} 
+                  className="h-10 w-10 border border-white/10 flex items-center justify-center hover:bg-primary transition-all"
+                  aria-label="Correo Electrónico"
+                >
+                  <Mail className="h-4 w-4" />
+                </a>
+              )}
             </div>
           </div>
           
@@ -53,6 +80,7 @@ export function Footer() {
                 <li><Link href="/experiencia" className="hover:text-primary transition-colors">Áreas</Link></li>
                 <li><Link href="/proyectos" className="hover:text-primary transition-colors">Proyectos</Link></li>
                 <li><Link href="/blog" className="hover:text-primary transition-colors">Insights</Link></li>
+                <li><Link href="/recursos" className="hover:text-primary transition-colors">Recursos</Link></li>
                 <li><Link href="/multimedia" className="hover:text-primary transition-colors">Multimedia</Link></li>
               </ul>
             </div>
@@ -68,7 +96,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20">
-            © {year || ''} THE OTHER NARRATIVE | NARRATIVAS QUE GENERAN CONFIANZA.
+            © {year || ''} {settings.footerCopyright || "THE OTHER NARRATIVE | NARRATIVAS QUE GENERAN CONFIANZA."}
           </p>
         </div>
       </div>

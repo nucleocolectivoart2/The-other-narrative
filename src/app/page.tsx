@@ -21,15 +21,12 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-
-const featuredVideos = [
-  { id: '0DmyalU2zL4', title: 'HAY FESTIVAL: Diálogos de Cambio', thumbnail: 'https://img.youtube.com/vi/0DmyalU2zL4/hqdefault.jpg' },
-  { id: 'VzQC-PPZmKQ', title: 'Conferencia: Narrativas que Movilizan', thumbnail: 'https://img.youtube.com/vi/VzQC-PPZmKQ/hqdefault.jpg' },
-  { id: 'JhQ_EpuoiOQ', title: 'Estrategia de Comunicación Responsable', thumbnail: 'https://img.youtube.com/vi/JhQ_EpuoiOQ/hqdefault.jpg' }
-];
+import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { extractYouTubeId } from '@/lib/default-settings';
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0);
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -43,6 +40,15 @@ export default function HomePage() {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const heroVideoId = extractYouTubeId(settings.heroVideoId) || '0DmyalU2zL4';
+  const videos = (settings.featuredVideos && settings.featuredVideos.length > 0)
+    ? settings.featuredVideos
+    : [
+        { id: '0DmyalU2zL4', title: 'HAY FESTIVAL: Diálogos de Cambio' },
+        { id: 'VzQC-PPZmKQ', title: 'Conferencia: Narrativas que Movilizan' },
+        { id: 'JhQ_EpuoiOQ', title: 'Estrategia de Comunicación Responsable' }
+      ];
 
   return (
     <div className="flex flex-col min-h-screen bg-background relative selection:bg-primary/30 overflow-x-hidden">
@@ -60,7 +66,7 @@ export default function HomePage() {
             }}
           >
             <iframe
-              src="https://www.youtube-nocookie.com/embed/0DmyalU2zL4?autoplay=1&mute=1&controls=0&loop=1&playlist=0DmyalU2zL4&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&origin=https://ais-dev-u32u2sgirnzop3defgmbes-27258313979.us-east1.run.app"
+              src={`https://www.youtube-nocookie.com/embed/${heroVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${heroVideoId}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1`}
               className="absolute top-0 left-0 w-full h-full object-cover brightness-[0.38] grayscale-[0.15] scale-105 transition-opacity duration-1000"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -91,17 +97,17 @@ export default function HomePage() {
             <div className="space-y-4 sm:space-y-5 max-w-3xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300 ease-out fill-mode-both">
               <div className="flex flex-col gap-1.5 sm:gap-2">
                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold tracking-tight uppercase leading-tight">
-                  Narrativas que generan <span className="text-primary italic font-headline lowercase">confianza.</span>
+                  {settings.heroTitleLine1} <span className="text-primary italic font-headline lowercase">{settings.heroTitleHighlight1}</span>
                 </p>
                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold tracking-tight uppercase leading-tight">
-                  Estrategias que movilizan <span className="text-primary italic font-headline lowercase">personas.</span>
+                  {settings.heroTitleLine2} <span className="text-primary italic font-headline lowercase">{settings.heroTitleHighlight2}</span>
                 </p>
               </div>
 
               {/* Bloque de Propósito Editorial */}
               <div className="border-l-2 border-primary/40 max-w-xl mt-4 sm:mt-5 pl-5 py-1">
                 <p className="text-xs sm:text-sm md:text-[15px] text-white/80 font-light leading-relaxed">
-                  En un entorno saturado, ayudamos a organizaciones a transformar conocimiento, propósito y estrategia en narrativas capaces de generar comprensión, participación y acción.
+                  {settings.heroPurpose}
                 </p>
               </div>
             </div>
@@ -113,17 +119,26 @@ export default function HomePage() {
           <div className="section-container flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex gap-4">
               <Link 
-                href="/blog" 
+                href={settings.heroButtonPrimaryLink || "/blog"} 
                 className="btn-editorial bg-primary text-white hover:bg-white hover:text-primary h-10 px-8 text-[9px] tracking-[0.3em] font-bold transition-all duration-500"
               >
-                INSIGHTS
+                {settings.heroButtonPrimaryText || "INSIGHTS"}
               </Link>
-              <button 
-                onClick={() => scrollToSection('mission')} 
-                className="btn-editorial border-white/20 text-white hover:bg-white/10 h-10 px-8 text-[9px] tracking-[0.3em] font-bold group"
-              >
-                NUESTRA MIRADA <ArrowRight className="ml-3 h-3 w-3 group-hover:translate-x-1 transition-transform" />
-              </button>
+              {settings.heroButtonSecondaryLink.startsWith('#') ? (
+                <button 
+                  onClick={() => scrollToSection(settings.heroButtonSecondaryLink.replace('#', ''))} 
+                  className="btn-editorial border-white/20 text-white hover:bg-white/10 h-10 px-8 text-[9px] tracking-[0.3em] font-bold group"
+                >
+                  {settings.heroButtonSecondaryText || "NUESTRA MIRADA"} <ArrowRight className="ml-3 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                </button>
+              ) : (
+                <Link 
+                  href={settings.heroButtonSecondaryLink} 
+                  className="btn-editorial border-white/20 text-white hover:bg-white/10 h-10 px-8 text-[9px] tracking-[0.3em] font-bold group inline-flex items-center"
+                >
+                  {settings.heroButtonSecondaryText || "NUESTRA MIRADA"} <ArrowRight className="ml-3 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              )}
             </div>
             
             <button 
@@ -150,7 +165,7 @@ export default function HomePage() {
             <div className="lg:col-span-5 order-2 lg:order-1">
               <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm shadow-2xl bg-muted group">
                 <Image
-                  src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/01_articular_realidades.png"
+                  src={settings.missionImage || "https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/01_articular_realidades.png"}
                   alt="Articulación de Realidades"
                   fill
                   referrerPolicy="no-referrer"
@@ -163,25 +178,27 @@ export default function HomePage() {
             <div className="lg:col-span-7 space-y-10 order-1 lg:order-2">
               <div className="space-y-6">
                 <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase flex items-center gap-4">
-                  <div className="h-px w-8 bg-primary/40" /> EL DESAFÍO
+                  <div className="h-px w-8 bg-primary/40" /> {settings.missionEyebrow || "EL DESAFÍO"}
                 </span>
                 <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-headline leading-[1.1] tracking-tighter text-foreground">
-                  Articular <br />
-                  <span className="italic font-normal text-primary">Realidades.</span>
+                  {settings.missionTitle} <br />
+                  <span className="italic font-normal text-primary">{settings.missionTitleHighlight}</span>
                 </h2>
               </div>
               
               <div className="space-y-8 max-w-2xl">
                 <p className="text-lg sm:text-xl text-foreground/80 font-light leading-relaxed">
-                  Las organizaciones enfrentan un desafío cada vez mayor: comunicar en medio de la saturación informativa, construir confianza en entornos complejos y conectar sus objetivos de negocio con las expectativas de una sociedad que exige coherencia, transparencia e impacto.
+                  {settings.missionText}
                 </p>
                 
-                <div className="relative pl-10 py-4">
-                  <div className="absolute left-0 top-0 h-full w-[1px] bg-gradient-to-b from-primary via-primary/40 to-transparent" />
-                  <p className="text-base sm:text-lg text-muted-foreground font-light leading-relaxed italic">
-                    &ldquo;No creemos en comunicar por comunicar. Creemos en construir conversaciones que ayuden a generar valor para los negocios, la sociedad y el planeta.&rdquo;
-                  </p>
-                </div>
+                {settings.missionQuote && (
+                  <div className="relative pl-10 py-4">
+                    <div className="absolute left-0 top-0 h-full w-[1px] bg-gradient-to-b from-primary via-primary/40 to-transparent" />
+                    <p className="text-base sm:text-lg text-muted-foreground font-light leading-relaxed italic">
+                      &ldquo;{settings.missionQuote}&rdquo;
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -247,50 +264,54 @@ export default function HomePage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 bg-black border-t border-l border-white/5">
-          {featuredVideos.map((video) => (
-            <Dialog key={video.id}>
-              <DialogTrigger asChild>
-                <div className="group relative bg-black aspect-square overflow-hidden cursor-pointer border-r border-b border-white/5">
-                  <Image
-                    src={video.thumbnail}
-                    alt={video.title}
-                    fill
-                    referrerPolicy="no-referrer"
-                    className="object-cover grayscale brightness-[0.5] group-hover:brightness-[0.8] group-hover:grayscale-0 transition-all duration-1000 scale-100 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 z-10 p-10 flex flex-col justify-between">
-                    <div className="space-y-6">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/40 block">VIDEO</span>
-                      <h3 className="text-2xl font-bold font-headline tracking-tighter leading-tight group-hover:text-primary transition-colors">
-                        {video.title}
-                      </h3>
-                    </div>
-                    <div className="flex items-center justify-between pt-6 border-t border-white/10">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40 group-hover:opacity-100 transition-opacity">REPRODUCIR</span>
-                      <div className="h-14 w-14 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all shadow-2xl">
-                        <Play className="h-5 w-5 fill-white ml-0.5" />
+          {videos.map((video) => {
+            const vidId = extractYouTubeId(video.id);
+            const thumbUrl = video.thumbnail || `https://img.youtube.com/vi/${vidId}/hqdefault.jpg`;
+            return (
+              <Dialog key={video.id}>
+                <DialogTrigger asChild>
+                  <div className="group relative bg-black aspect-square overflow-hidden cursor-pointer border-r border-b border-white/5">
+                    <Image
+                      src={thumbUrl}
+                      alt={video.title}
+                      fill
+                      referrerPolicy="no-referrer"
+                      className="object-cover grayscale brightness-[0.5] group-hover:brightness-[0.8] group-hover:grayscale-0 transition-all duration-1000 scale-100 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 z-10 p-10 flex flex-col justify-between">
+                      <div className="space-y-6">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/40 block">VIDEO</span>
+                        <h3 className="text-2xl font-bold font-headline tracking-tighter leading-tight group-hover:text-primary transition-colors">
+                          {video.title}
+                        </h3>
+                      </div>
+                      <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40 group-hover:opacity-100 transition-opacity">REPRODUCIR</span>
+                        <div className="h-14 w-14 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all shadow-2xl">
+                          <Play className="h-5 w-5 fill-white ml-0.5" />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-w-6xl p-0 bg-black aspect-video border-0 shadow-2xl overflow-hidden rounded-sm">
-                <DialogHeader>
-                  <DialogTitle className="sr-only">{video.title}</DialogTitle>
-                  <DialogDescription className="sr-only">Reproductor de video para {video.title}</DialogDescription>
-                </DialogHeader>
-                <iframe 
-                  width="100%" 
-                  height="100%" 
-                  src={`https://www.youtube.com/embed/${video.id}?autoplay=1`} 
-                  frameBorder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowFullScreen 
-                  title={video.title}
-                />
-              </DialogContent>
-            </Dialog>
-          ))}
+                </DialogTrigger>
+                <DialogContent className="max-w-6xl p-0 bg-black aspect-video border-0 shadow-2xl overflow-hidden rounded-sm">
+                  <DialogHeader>
+                    <DialogTitle className="sr-only">{video.title}</DialogTitle>
+                    <DialogDescription className="sr-only">Reproductor de video para {video.title}</DialogDescription>
+                  </DialogHeader>
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src={`https://www.youtube.com/embed/${vidId}?autoplay=1`} 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen 
+                    title={video.title}
+                  />
+                </DialogContent>
+              </Dialog>
+            );
+          })}
         </div>
       </section>
     </div>

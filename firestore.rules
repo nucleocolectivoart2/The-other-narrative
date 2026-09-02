@@ -47,10 +47,15 @@ service cloud.firestore {
     match /contentItems/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
     match /podcasts/{id} { allow read: if true; allow write: if true; }
     match /projects/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
-    match /resources/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
+    match /resources/{id} { 
+      allow read: if allowPublicRead(); 
+      allow create, delete: if isAdmin(); 
+      allow update: if isAdmin() || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloadsCount']));
+    }
     match /recognitions/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
     match /testimonials/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
     match /featuredVideos/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
+    match /siteSettings/{id} { allow read: if allowPublicRead(); allow write: if true; }
 
     // Mensajes de contacto: Cualquier usuario puede crear, solo admin puede leer/borrar
     match /messages/{id} {

@@ -15,6 +15,7 @@ interface Article {
   excerpt: string;
   image?: string;
   type: string;
+  status?: string;
   date: string;
   readTime?: number;
 }
@@ -50,10 +51,15 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
             referrerPolicy="no-referrer"
             className="object-cover grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-1000 scale-100 group-hover:scale-110"
           />
-          <div className="absolute top-6 left-6 z-10">
+          <div className="absolute top-6 left-6 z-10 flex items-center gap-2">
             <span className="bg-primary text-white text-[8px] font-bold px-4 py-2 uppercase tracking-[0.2em] shadow-2xl">
               {article.type}
             </span>
+            {article.status === 'draft' && (
+              <span className="bg-amber-600 text-white text-[8px] font-bold px-3 py-2 uppercase tracking-[0.2em] shadow-2xl">
+                Borrador
+              </span>
+            )}
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
         </div>

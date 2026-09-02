@@ -11,6 +11,7 @@ const navLinks = [
   { name: 'Áreas', href: '/experiencia' },
   { name: 'Proyectos', href: '/proyectos' },
   { name: 'Insights', href: '/blog' },
+  { name: 'Recursos', href: '/recursos' },
   { name: 'Multimedia', href: '/multimedia' },
   { name: 'Contacto', href: '/contacto' },
 ];

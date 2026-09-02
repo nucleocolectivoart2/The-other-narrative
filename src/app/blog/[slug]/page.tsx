@@ -3,17 +3,30 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, where, limit } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CalendarDays, Clock, ArrowLeft, Loader2, User, MessageCircleQuestion } from 'lucide-react';
+import { CalendarDays, Clock, ArrowLeft, Loader2, User, MessageCircleQuestion, AlertCircle, Edit3 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function ArticleDetailPage() {
   const { slug } = useParams();
   const firestore = useFirestore();
+  const { user } = useUser();
   const [formattedDate, setFormattedDate] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    try {
+      const session = localStorage.getItem('medular_admin_session');
+      if (session || user) {
+        setIsAdmin(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, [user]);
 
   const articleQuery = useMemoFirebase(() => {
     if (!slug) return null;
@@ -57,8 +70,41 @@ export default function ArticleDetailPage() {
     );
   }
 
+  // If article is draft and viewer is not admin, show respectful draft message
+  if (article.status === 'draft' && !isAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8 text-center space-y-6">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 mb-2">
+          <AlertCircle className="h-7 w-7" />
+        </div>
+        <span className="text-primary font-bold tracking-[0.4em] uppercase text-[10px]">Edición en Curso</span>
+        <h1 className="text-2xl sm:text-4xl font-bold font-headline">Esta crónica se encuentra en preparación</h1>
+        <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
+          El equipo editorial está trabajando en esta investigación. Pronto estará disponible en la bitácora abierta.
+        </p>
+        <Link href="/blog" className="btn-editorial btn-editorial-primary mt-4">Volver a la Bitácora</Link>
+      </div>
+    );
+  }
+
   return (
     <main className="bg-background min-h-screen pb-24 sm:pb-32">
+      {/* Banner de Borrador para Administradores */}
+      {article.status === 'draft' && (
+        <div className="bg-amber-600 text-white px-4 py-2.5 text-xs font-semibold flex items-center justify-between sticky top-0 z-50 shadow-md">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span><strong>Modo Borrador:</strong> Esta crónica no es visible públicamente en la bitácora.</span>
+          </div>
+          <Link 
+            href="/admin" 
+            className="inline-flex items-center gap-1.5 bg-white text-amber-900 px-3 py-1 rounded text-[11px] font-bold hover:bg-white/90 transition-colors shrink-0"
+          >
+            <Edit3 className="h-3 w-3" /> Editar en CMS
+          </Link>
+        </div>
+      )}
+
       <section className="relative h-[70vh] sm:h-[80vh] w-full flex items-end pb-16 sm:pb-24 overflow-hidden bg-white border-b">
         <div className="absolute inset-0 z-0">
           <Image
