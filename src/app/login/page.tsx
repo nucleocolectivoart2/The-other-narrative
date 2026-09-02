@@ -14,7 +14,11 @@ import {
   EyeOff, 
   ChevronLeft,
   KeyRound,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  Copy,
+  Check,
+  Globe
 } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { 
@@ -51,6 +55,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [unauthorizedDomain, setUnauthorizedDomain] = useState<string | null>(null);
+  const [copiedDomain, setCopiedDomain] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [year, setYear] = useState<number | null>(null);
@@ -83,6 +89,21 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
+  const selectTeamAccount = (targetEmail: string) => {
+    setEmail(targetEmail);
+    setPassword(MASTER_PASSWORD);
+    setError('');
+    setUnauthorizedDomain(null);
+  };
+
+  const copyCurrentHost = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.hostname);
+      setCopiedDomain(true);
+      setTimeout(() => setCopiedDomain(false), 2000);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanEmail = email.trim().toLowerCase();
@@ -95,6 +116,7 @@ export default function LoginPage() {
 
     setIsLoading(true);
     setError('');
+    setUnauthorizedDomain(null);
 
     const isAuthorized = AUTHORIZED_ACCOUNTS.some(a => a.email.toLowerCase() === cleanEmail);
 
@@ -129,8 +151,6 @@ export default function LoginPage() {
         router.push('/admin');
         return;
       } catch (err: any) {
-        console.warn("Firebase Auth attempt:", err?.code || err?.message);
-        
         // If master credentials match for authorized team member, allow session even if Firebase Auth has constraints
         if (isAuthorized && cleanPassword === MASTER_PASSWORD) {
           localStorage.setItem('medular_admin_session', JSON.stringify({
@@ -178,6 +198,7 @@ export default function LoginPage() {
     
     setIsGoogleLoading(true);
     setError('');
+    setUnauthorizedDomain(null);
     const provider = new GoogleAuthProvider();
     
     try {
@@ -194,15 +215,18 @@ export default function LoginPage() {
         setError(`El correo (${userEmail}) no cuenta con permisos de administración.`);
       }
     } catch (err: any) {
-      console.error("Google Auth Error:", err);
       const code = err?.code || '';
       
-      if (code === 'auth/popup-blocked') {
+      if (code === 'auth/unauthorized-domain') {
+        const host = typeof window !== 'undefined' ? window.location.hostname : 'este dominio';
+        setUnauthorizedDomain(host);
+        setError('El dominio actual de vista previa no está en los Dominios Autorizados de Firebase Console. Puedes ingresar directamente seleccionando tu cuenta autorizada con la clave maestra.');
+      } else if (code === 'auth/popup-blocked') {
         setError('El navegador bloqueó la ventana emergente. Habilita los popups o ingresa con correo y contraseña.');
       } else if (code === 'auth/cancelled-popup-request') {
-        setError('Operación cancelada.');
+        setError('Operación de Google cancelada.');
       } else {
-        setError('No se pudo iniciar sesión con Google. Puedes acceder con tu correo y contraseña maestra.');
+        setError('No se pudo completar el acceso con Google en este entorno. Usa el acceso con correo y clave maestra.');
       }
       setIsGoogleLoading(false);
     }
@@ -232,7 +256,7 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12)] p-6 sm:p-10 border border-border/60 space-y-7">
+        <div className="bg-white rounded-xl shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12)] p-6 sm:p-10 border border-border/60 space-y-6">
           <div className="text-center space-y-2">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
               <ShieldCheck className="h-6 w-6" />
@@ -243,6 +267,30 @@ export default function LoginPage() {
             <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-[0.25em]">
               Gestión de Narrativas & CMS
             </p>
+          </div>
+
+          {/* Quick Team Account Selection */}
+          <div className="bg-zinc-50/80 border border-border/60 rounded-lg p-3.5 space-y-2">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              <Sparkles className="h-3 w-3 text-primary" /> Acceso Rápido del Equipo
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {AUTHORIZED_ACCOUNTS.map((acc) => (
+                <button
+                  key={acc.email}
+                  type="button"
+                  onClick={() => selectTeamAccount(acc.email)}
+                  className={`text-left p-2 rounded-md border text-xs transition-all ${
+                    email.toLowerCase() === acc.email.toLowerCase()
+                      ? 'border-primary bg-primary/5 text-primary font-bold shadow-xs'
+                      : 'border-border/60 bg-white hover:border-primary/50 text-foreground'
+                  }`}
+                >
+                  <p className="font-semibold truncate text-[11px]">{acc.name}</p>
+                  <p className="text-[9px] text-muted-foreground truncate">{acc.role}</p>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-5">
@@ -318,6 +366,31 @@ export default function LoginPage() {
                   </div>
                 </Alert>
               )}
+
+              {unauthorizedDomain && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-semibold">
+                    <Globe className="h-4 w-4" />
+                    <span>Dominio para Autorizar en Firebase</span>
+                  </div>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed">
+                    Para habilitar el popup de Google en esta vista previa, añade este dominio en la consola de Firebase (<strong>Authentication &gt; Settings &gt; Authorized domains</strong>):
+                  </p>
+                  <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 rounded p-2 border border-border">
+                    <code className="text-[11px] flex-1 truncate font-mono text-foreground">{unauthorizedDomain}</code>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={copyCurrentHost}
+                      className="h-7 px-2 text-[10px] gap-1"
+                    >
+                      {copiedDomain ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+                      <span>{copiedDomain ? 'Copiado' : 'Copiar'}</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
             </form>
 
             <div className="relative my-4">
@@ -328,7 +401,7 @@ export default function LoginPage() {
             </div>
 
             <Button 
-              type="button"
+              type="button" 
               variant="outline" 
               onClick={handleGoogleLogin} 
               disabled={isGoogleLoading || isLoading}
