@@ -32,7 +32,8 @@ export default function ConcienciaPage() {
     }
   ];
 
-  const displayTestimonials = (testimonials && testimonials.length > 0) ? testimonials : mockTestimonials;
+  const publishedTestimonials = (testimonials || []).filter((t: any) => t.status !== 'draft');
+  const displayTestimonials = publishedTestimonials.length > 0 ? publishedTestimonials : ((testimonials && testimonials.length > 0) ? [] : mockTestimonials);
 
   const odsIcons = [
     { num: 4, name: 'Educación de Calidad' },

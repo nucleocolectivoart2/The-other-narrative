@@ -100,9 +100,10 @@ export default function RecursosPage() {
 
   const { data: firestoreResources, isLoading } = useCollection(resourcesQuery);
 
-  const rawResources: ResourceItem[] = (firestoreResources && firestoreResources.length > 0)
-    ? firestoreResources as unknown as ResourceItem[]
-    : defaultResources;
+  const publishedFirestoreResources = ((firestoreResources as unknown as ResourceItem[]) || []).filter((r: any) => r.status !== 'draft');
+  const rawResources: ResourceItem[] = publishedFirestoreResources.length > 0
+    ? publishedFirestoreResources
+    : ((firestoreResources && firestoreResources.length > 0) ? [] : defaultResources);
 
   const categories = Array.from(new Set([
     'Toolkit',

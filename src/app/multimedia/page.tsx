@@ -58,14 +58,16 @@ export default function MultimediaPage() {
   const videosQuery = useMemoFirebase(() => query(collection(firestore, 'featuredVideos'), orderBy('createdAt', 'desc')), [firestore]);
 
   const { data: fbPodcasts, isLoading: isPodLoading } = useCollection(podcastsQuery);
-  const allPodcasts = [...(fbPodcasts || []), ...spotifyPodcasts.filter(sp => !(fbPodcasts || []).some((fp: any) => fp.url?.includes(sp.id)))];
+  const publishedFbPodcasts = (fbPodcasts || []).filter((p: any) => p.status !== 'draft');
+  const allPodcasts = [...publishedFbPodcasts, ...spotifyPodcasts.filter(sp => !publishedFbPodcasts.some((fp: any) => fp.url?.includes(sp.id)))];
   
   const filteredPodcasts = selectedShow === 'all' 
     ? allPodcasts 
     : allPodcasts.filter(p => p.showId === selectedShow || p.showName?.toLowerCase().includes(selectedShow.toLowerCase()));
 
   const { data: fbVideos, isLoading: isVidLoading } = useCollection(videosQuery);
-  const rawVideos = (fbVideos && fbVideos.length > 0) ? fbVideos : defaultVideos;
+  const publishedFbVideos = (fbVideos || []).filter((v: any) => v.status !== 'draft');
+  const rawVideos = (publishedFbVideos && publishedFbVideos.length > 0) ? publishedFbVideos : defaultVideos;
   const videos = rawVideos.map((v: any) => {
     if ((v.id === '0DmyalU2zL4' || v.url?.includes('0DmyalU2zL4')) && (!v.title || v.title.includes('HAY FESTIVAL') || v.title === 'Diálogos de Cambio')) {
       return { ...v, title: 'COP 16' };

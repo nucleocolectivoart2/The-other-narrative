@@ -54,10 +54,11 @@ import {
   Play,
   FileDown,
   BarChart3,
-  Layers
+  Layers,
+  EyeOff
 } from 'lucide-react';
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, doc, deleteDoc, query, orderBy, updateDoc, setDoc } from 'firebase/firestore';
 import { defaultSiteSettings, SiteSettings, extractYouTubeId } from '@/lib/default-settings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -209,6 +210,17 @@ export default function AdminDashboard() {
   const effectiveEmail = (user?.email || sessionEmail || '').toLowerCase();
   const isAuthorized = adminData?.isAdmin || (effectiveEmail && AUTHORIZED_EMAILS.some(e => e.toLowerCase() === effectiveEmail));
 
+  // Sincronización automática de sesión de Firebase Auth en recargas de página
+  useEffect(() => {
+    if (!isUserLoading && !user && sessionEmail && auth) {
+      if (AUTHORIZED_EMAILS.some(e => e.toLowerCase() === sessionEmail.toLowerCase())) {
+        signInWithEmailAndPassword(auth, sessionEmail, 'narrative2026').catch(() => {
+          createUserWithEmailAndPassword(auth, sessionEmail, 'narrative2026').catch(() => {});
+        });
+      }
+    }
+  }, [user, isUserLoading, sessionEmail, auth]);
+
   const [activeTab, setActiveTab] = useState('overview');
   const [activeForm, setActiveForm] = useState<'none' | 'podcast' | 'project' | 'blog' | 'video' | 'testimonial' | 'resource'>('none');
   const [isSaving, setIsSaving] = useState(false);
@@ -234,20 +246,26 @@ export default function AdminDashboard() {
   const [podUrl, setPodUrl] = useState('');
   const [podGuest, setPodGuest] = useState('');
   const [podImage, setPodImage] = useState('');
+  const [podStatus, setPodStatus] = useState<'published' | 'draft'>('published');
 
   const [vidTitle, setVidTitle] = useState('');
   const [vidUrl, setVidUrl] = useState('');
   const [vidPlatform, setVidPlatform] = useState('YouTube');
+  const [vidDescription, setVidDescription] = useState('');
+  const [vidImage, setVidImage] = useState('');
+  const [vidStatus, setVidStatus] = useState<'published' | 'draft'>('published');
 
   const [projTitle, setProjTitle] = useState('');
   const [projDesc, setProjDesc] = useState('');
   const [projCategory, setProjCategory] = useState('');
   const [projImage, setProjImage] = useState('');
   const [projLink, setProjLink] = useState('');
+  const [projStatus, setProjStatus] = useState<'published' | 'draft'>('published');
 
   const [testQuote, setTestQuote] = useState('');
   const [testAuthorName, setTestAuthorName] = useState('');
   const [testAuthorTitle, setTestAuthorTitle] = useState('');
+  const [testStatus, setTestStatus] = useState<'published' | 'draft'>('published');
 
   // Estados para Recursos Descargables
   const [resTitle, setResTitle] = useState('');
@@ -257,6 +275,7 @@ export default function AdminDashboard() {
   const [resPages, setResPages] = useState('');
   const [resDownloadUrl, setResDownloadUrl] = useState('');
   const [resCoverImage, setResCoverImage] = useState('');
+  const [resStatus, setResStatus] = useState<'published' | 'draft'>('published');
 
   const blogQuery = useMemoFirebase(() => query(collection(firestore, 'contentItems'), orderBy('date', 'desc')), [firestore]);
   const { data: blogItems } = useCollection(blogQuery);
@@ -391,12 +410,22 @@ export default function AdminDashboard() {
     setBlogTitle(''); setBlogExcerpt(''); setBlogType('Reflexión'); setBlogImage('');
     setBlogStatus('published');
     setBlocks([{ id: 'reset', type: 'text', content: '', alignment: 'justify' }]);
-    setPodTitle(''); setPodDescription(''); setPodUrl(''); setPodGuest(''); setPodImage('');
-    setVidTitle(''); setVidUrl(''); setVidPlatform('YouTube');
-    setProjTitle(''); setProjDesc(''); setProjCategory(''); setProjImage(''); setProjLink('');
-    setTestQuote(''); setTestAuthorName(''); setTestAuthorTitle('');
-    setResTitle(''); setResDescription(''); setResCategory('Toolkit'); setResFormat('PDF Editorial'); setResPages(''); setResDownloadUrl(''); setResCoverImage('');
+    setPodTitle(''); setPodDescription(''); setPodUrl(''); setPodGuest(''); setPodImage(''); setPodStatus('published');
+    setVidTitle(''); setVidUrl(''); setVidPlatform('YouTube'); setVidDescription(''); setVidImage(''); setVidStatus('published');
+    setProjTitle(''); setProjDesc(''); setProjCategory(''); setProjImage(''); setProjLink(''); setProjStatus('published');
+    setTestQuote(''); setTestAuthorName(''); setTestAuthorTitle(''); setTestStatus('published');
+    setResTitle(''); setResDescription(''); setResCategory('Toolkit'); setResFormat('PDF Editorial'); setResPages(''); setResDownloadUrl(''); setResCoverImage(''); setResStatus('published');
     setActiveForm('none');
+  };
+
+  const deleteBlogPost = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de eliminar esta crónica? Esta acción retirará el contenido de la Bitácora.")) return;
+    try {
+      await deleteDoc(doc(firestore, 'contentItems', id));
+      toast({ title: "Crónica Eliminada", description: "El artículo fue removido de la base de datos." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al eliminar", description: err?.message || "No se pudo eliminar la crónica." });
+    }
   };
 
   const toggleArticleStatus = async (id: string, currentStatus: string = 'published') => {
@@ -504,72 +533,285 @@ export default function AdminDashboard() {
     toast({ title: "Narrativa Transferida", description: "El texto refinado ahora está en el editor." });
   };
 
-  const savePodcast = () => {
-    if (!podTitle || !podUrl) {
-      toast({ variant: "destructive", title: "Error", description: "Título y URL son obligatorios." });
+  // --- CRUD: PODCASTS ---
+  const savePodcast = (targetStatus?: 'published' | 'draft') => {
+    if (!podTitle.trim() || !podUrl.trim()) {
+      toast({ variant: "destructive", title: "Campos requeridos", description: "Título y URL del podcast son obligatorios." });
       return;
     }
+    const finalStatus = targetStatus || podStatus;
     setIsSaving(true);
-    addDoc(collection(firestore, 'podcasts'), {
-      title: podTitle,
-      description: podDescription,
-      url: podUrl,
-      guest: podGuest,
-      image: podImage,
-      createdAt: serverTimestamp()
-    }).then(() => {
-      toast({ title: "Éxito", description: "Podcast publicado." });
+    const data = {
+      title: podTitle.trim(),
+      description: podDescription.trim(),
+      url: podUrl.trim(),
+      guest: podGuest.trim(),
+      image: podImage.trim(),
+      status: finalStatus,
+      updatedAt: serverTimestamp()
+    };
+
+    const action = editingId
+      ? updateDoc(doc(firestore, 'podcasts', editingId), data)
+      : addDoc(collection(firestore, 'podcasts'), { ...data, createdAt: serverTimestamp() });
+
+    action.then(() => {
+      toast({ 
+        title: editingId ? "Podcast Actualizado" : "Podcast Publicado", 
+        description: editingId ? "Los cambios se han guardado con éxito." : "El episodio está guardado en Firestore." 
+      });
       cancelEditing();
       setActiveTab('inventory');
+    }).catch((err: any) => {
+      toast({ variant: "destructive", title: "Error al guardar", description: err?.message || "No se pudo guardar el podcast." });
     }).finally(() => setIsSaving(false));
   };
 
-  const saveProject = () => {
-    if (!projTitle) return;
+  const startEditPodcast = (item: any) => {
+    setEditingId(item.id);
+    setPodTitle(item.title || '');
+    setPodDescription(item.description || '');
+    setPodUrl(item.url || '');
+    setPodGuest(item.guest || '');
+    setPodImage(item.image || '');
+    setPodStatus(item.status || 'published');
+    setActiveForm('podcast');
+    setActiveTab('content');
+  };
+
+  const togglePodcastStatus = async (id: string, currentStatus: string = 'published') => {
+    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+    try {
+      await updateDoc(doc(firestore, 'podcasts', id), { status: newStatus, updatedAt: serverTimestamp() });
+      toast({ title: newStatus === 'published' ? "Podcast Publicado" : "Movido a Borrador" });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al cambiar estado", description: err?.message });
+    }
+  };
+
+  const deletePodcast = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de eliminar este podcast de la plataforma?")) return;
+    try {
+      await deleteDoc(doc(firestore, 'podcasts', id));
+      toast({ title: "Podcast Eliminado", description: "El episodio fue removido de Firestore." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al eliminar", description: err?.message });
+    }
+  };
+
+  // --- CRUD: PROYECTOS ---
+  const saveProject = (targetStatus?: 'published' | 'draft') => {
+    if (!projTitle.trim()) {
+      toast({ variant: "destructive", title: "Campo requerido", description: "El título del proyecto es obligatorio." });
+      return;
+    }
+    const finalStatus = targetStatus || projStatus;
     setIsSaving(true);
-    addDoc(collection(firestore, 'projects'), {
-      title: projTitle,
-      description: projDesc,
-      category: projCategory,
-      image: projImage,
-      link: projLink,
-      createdAt: serverTimestamp()
-    }).then(() => {
-      toast({ title: "Éxito", description: "Proyecto guardado." });
+    const data = {
+      title: projTitle.trim(),
+      description: projDesc.trim(),
+      category: projCategory.trim() || 'Regeneración',
+      image: projImage.trim() || 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/03.png',
+      link: projLink.trim() || '/multimedia',
+      status: finalStatus,
+      updatedAt: serverTimestamp()
+    };
+
+    const action = editingId
+      ? updateDoc(doc(firestore, 'projects', editingId), data)
+      : addDoc(collection(firestore, 'projects'), { ...data, createdAt: serverTimestamp() });
+
+    action.then(() => {
+      toast({ 
+        title: editingId ? "Proyecto Actualizado" : "Proyecto Guardado", 
+        description: editingId ? "Los cambios se guardaron con éxito." : "El caso técnico se guardó en Firestore." 
+      });
       cancelEditing();
       setActiveTab('inventory');
+    }).catch((err: any) => {
+      toast({ variant: "destructive", title: "Error al guardar", description: err?.message || "No se pudo guardar el proyecto." });
     }).finally(() => setIsSaving(false));
   };
 
-  const saveTestimonial = () => {
-    if (!testQuote || !testAuthorName) return;
+  const startEditProject = (item: any) => {
+    setEditingId(item.id);
+    setProjTitle(item.title || '');
+    setProjDesc(item.description || '');
+    setProjCategory(item.category || '');
+    setProjImage(item.image || '');
+    setProjLink(item.link || '');
+    setProjStatus(item.status || 'published');
+    setActiveForm('project');
+    setActiveTab('content');
+  };
+
+  const toggleProjectStatus = async (id: string, currentStatus: string = 'published') => {
+    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+    try {
+      await updateDoc(doc(firestore, 'projects', id), { status: newStatus, updatedAt: serverTimestamp() });
+      toast({ title: newStatus === 'published' ? "Proyecto Publicado" : "Movido a Borrador" });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al cambiar estado", description: err?.message });
+    }
+  };
+
+  const deleteProject = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de eliminar este proyecto del portafolio?")) return;
+    try {
+      await deleteDoc(doc(firestore, 'projects', id));
+      toast({ title: "Proyecto Eliminado", description: "El proyecto fue retirado de Firestore." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al eliminar", description: err?.message });
+    }
+  };
+
+  // --- CRUD: TESTIMONIOS ---
+  const saveTestimonial = (targetStatus?: 'published' | 'draft') => {
+    if (!testQuote.trim() || !testAuthorName.trim()) {
+      toast({ variant: "destructive", title: "Campos requeridos", description: "La cita y el nombre del autor son obligatorios." });
+      return;
+    }
+    const finalStatus = targetStatus || testStatus;
     setIsSaving(true);
-    addDoc(collection(firestore, 'testimonials'), {
-      quote: testQuote,
-      authorName: testAuthorName,
-      authorTitle: testAuthorTitle,
-      createdAt: serverTimestamp()
-    }).then(() => {
-      toast({ title: "Éxito", description: "Testimonio guardado." });
+    const data = {
+      quote: testQuote.trim(),
+      authorName: testAuthorName.trim(),
+      authorTitle: testAuthorTitle.trim(),
+      status: finalStatus,
+      updatedAt: serverTimestamp()
+    };
+
+    const action = editingId
+      ? updateDoc(doc(firestore, 'testimonials', editingId), data)
+      : addDoc(collection(firestore, 'testimonials'), { ...data, createdAt: serverTimestamp() });
+
+    action.then(() => {
+      toast({ 
+        title: editingId ? "Testimonio Actualizado" : "Testimonio Guardado", 
+        description: editingId ? "Los cambios se guardaron con éxito." : "El testimonio se guardó en Firestore." 
+      });
       cancelEditing();
       setActiveTab('inventory');
+    }).catch((err: any) => {
+      toast({ variant: "destructive", title: "Error al guardar", description: err?.message || "No se pudo guardar el testimonio." });
     }).finally(() => setIsSaving(false));
   };
 
-  const saveResource = () => {
+  const startEditTestimonial = (item: any) => {
+    setEditingId(item.id);
+    setTestQuote(item.quote || '');
+    setTestAuthorName(item.authorName || '');
+    setTestAuthorTitle(item.authorTitle || '');
+    setTestStatus(item.status || 'published');
+    setActiveForm('testimonial');
+    setActiveTab('content');
+  };
+
+  const toggleTestimonialStatus = async (id: string, currentStatus: string = 'published') => {
+    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+    try {
+      await updateDoc(doc(firestore, 'testimonials', id), { status: newStatus, updatedAt: serverTimestamp() });
+      toast({ title: newStatus === 'published' ? "Testimonio Publicado" : "Movido a Borrador" });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al cambiar estado", description: err?.message });
+    }
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de eliminar este testimonio?")) return;
+    try {
+      await deleteDoc(doc(firestore, 'testimonials', id));
+      toast({ title: "Testimonio Eliminado", description: "El testimonio fue retirado de Firestore." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al eliminar", description: err?.message });
+    }
+  };
+
+  // --- CRUD: VIDEOS Y MULTIMEDIA ---
+  const saveVideo = (targetStatus?: 'published' | 'draft') => {
+    if (!vidTitle.trim() || !vidUrl.trim()) {
+      toast({ variant: "destructive", title: "Campos requeridos", description: "Título y URL del video son obligatorios." });
+      return;
+    }
+    const finalStatus = targetStatus || vidStatus;
+    setIsSaving(true);
+    const ytId = extractYouTubeId(vidUrl.trim());
+    const data = {
+      title: vidTitle.trim(),
+      url: vidUrl.trim(),
+      platform: vidPlatform || 'YouTube',
+      description: vidDescription.trim(),
+      image: vidImage.trim() || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : ''),
+      youtubeId: ytId,
+      status: finalStatus,
+      updatedAt: serverTimestamp()
+    };
+
+    const action = editingId
+      ? updateDoc(doc(firestore, 'featuredVideos', editingId), data)
+      : addDoc(collection(firestore, 'featuredVideos'), { ...data, createdAt: serverTimestamp() });
+
+    action.then(() => {
+      toast({ 
+        title: editingId ? "Video Actualizado" : "Video Publicado", 
+        description: editingId ? "Los cambios se guardaron con éxito." : "El video se guardó en Firestore." 
+      });
+      cancelEditing();
+      setActiveTab('inventory');
+    }).catch((err: any) => {
+      toast({ variant: "destructive", title: "Error al guardar", description: err?.message || "No se pudo guardar el video." });
+    }).finally(() => setIsSaving(false));
+  };
+
+  const startEditVideo = (item: any) => {
+    setEditingId(item.id);
+    setVidTitle(item.title || '');
+    setVidUrl(item.url || '');
+    setVidPlatform(item.platform || 'YouTube');
+    setVidDescription(item.description || '');
+    setVidImage(item.image || '');
+    setVidStatus(item.status || 'published');
+    setActiveForm('video');
+    setActiveTab('content');
+  };
+
+  const toggleVideoStatus = async (id: string, currentStatus: string = 'published') => {
+    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+    try {
+      await updateDoc(doc(firestore, 'featuredVideos', id), { status: newStatus, updatedAt: serverTimestamp() });
+      toast({ title: newStatus === 'published' ? "Video Publicado" : "Movido a Borrador" });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al cambiar estado", description: err?.message });
+    }
+  };
+
+  const deleteVideo = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de eliminar este contenido audiovisual?")) return;
+    try {
+      await deleteDoc(doc(firestore, 'featuredVideos', id));
+      toast({ title: "Video Eliminado", description: "El video fue retirado de Firestore." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al eliminar", description: err?.message });
+    }
+  };
+
+  // --- CRUD: RECURSOS ---
+  const saveResource = (targetStatus?: 'published' | 'draft') => {
     if (!resTitle || !resDownloadUrl) {
       toast({ variant: "destructive", title: "Campos requeridos", description: "El título y el enlace de descarga son obligatorios." });
       return;
     }
+    const finalStatus = targetStatus || resStatus;
     setIsSaving(true);
     const data = {
-      title: resTitle,
-      description: resDescription || '',
+      title: resTitle.trim(),
+      description: resDescription.trim() || '',
       category: resCategory || 'Toolkit',
       format: resFormat || 'PDF Editorial',
-      pages: resPages || '',
-      downloadUrl: resDownloadUrl,
-      coverImage: resCoverImage || '',
+      pages: resPages.trim() || '',
+      downloadUrl: resDownloadUrl.trim(),
+      coverImage: resCoverImage.trim() || '',
+      status: finalStatus,
       updatedAt: serverTimestamp()
     };
 
@@ -583,7 +825,7 @@ export default function AdminDashboard() {
         description: editingId ? "Los cambios se han guardado con éxito." : "El nuevo recurso ya está disponible en la Biblioteca." 
       });
       cancelEditing();
-      setActiveTab('resources');
+      setActiveTab('inventory');
     }).catch(err => {
       toast({ variant: "destructive", title: "Error al guardar", description: err?.message || "No se pudo guardar el recurso." });
     }).finally(() => setIsSaving(false));
@@ -598,12 +840,23 @@ export default function AdminDashboard() {
     setResPages(item.pages || '');
     setResDownloadUrl(item.downloadUrl || '');
     setResCoverImage(item.coverImage || '');
+    setResStatus(item.status || 'published');
     setActiveForm('resource');
     setActiveTab('content');
   };
 
+  const toggleResourceStatus = async (id: string, currentStatus: string = 'published') => {
+    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+    try {
+      await updateDoc(doc(firestore, 'resources', id), { status: newStatus, updatedAt: serverTimestamp() });
+      toast({ title: newStatus === 'published' ? "Recurso Publicado" : "Movido a Borrador" });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error al cambiar estado", description: err?.message });
+    }
+  };
+
   const deleteResource = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este recurso de la biblioteca pública?')) return;
+    if (!window.confirm('¿Estás seguro de eliminar este recurso de la biblioteca pública?')) return;
     try {
       await deleteDoc(doc(firestore, 'resources', id));
       toast({ title: "Recurso Eliminado", description: "El material fue retirado de la biblioteca." });
@@ -1521,11 +1774,13 @@ export default function AdminDashboard() {
           <TabsContent value="inventory" className="animate-in fade-in duration-500">
             <Card className="rounded-sm overflow-hidden border shadow-xl">
                <Tabs defaultValue="inv-blog">
-                  <TabsList className="w-full justify-start border-b rounded-none h-16 bg-muted/5 p-0">
-                    <TabsTrigger value="inv-blog" className="h-full rounded-none px-12 text-[10px] font-bold uppercase tracking-widest">Bitácora</TabsTrigger>
-                    <TabsTrigger value="inv-proj" className="h-full rounded-none px-12 text-[10px] font-bold uppercase tracking-widest">Proyectos</TabsTrigger>
-                    <TabsTrigger value="inv-test" className="h-full rounded-none px-12 text-[10px] font-bold uppercase tracking-widest">Testimonios</TabsTrigger>
-                    <TabsTrigger value="inv-pod" className="h-full rounded-none px-12 text-[10px] font-bold uppercase tracking-widest">Podcast</TabsTrigger>
+                  <TabsList className="w-full justify-start border-b rounded-none h-16 bg-muted/5 p-0 overflow-x-auto">
+                    <TabsTrigger value="inv-blog" className="h-full rounded-none px-6 text-[10px] font-bold uppercase tracking-widest">Bitácora ({blogItems?.length || 0})</TabsTrigger>
+                    <TabsTrigger value="inv-proj" className="h-full rounded-none px-6 text-[10px] font-bold uppercase tracking-widest">Proyectos ({projectItems?.length || 0})</TabsTrigger>
+                    <TabsTrigger value="inv-test" className="h-full rounded-none px-6 text-[10px] font-bold uppercase tracking-widest">Testimonios ({testimonialItems?.length || 0})</TabsTrigger>
+                    <TabsTrigger value="inv-pod" className="h-full rounded-none px-6 text-[10px] font-bold uppercase tracking-widest">Podcast ({podItems?.length || 0})</TabsTrigger>
+                    <TabsTrigger value="inv-vid" className="h-full rounded-none px-6 text-[10px] font-bold uppercase tracking-widest">Videos ({videoItems?.length || 0})</TabsTrigger>
+                    <TabsTrigger value="inv-res" className="h-full rounded-none px-6 text-[10px] font-bold uppercase tracking-widest">Recursos ({resourceItems?.length || 0})</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="inv-blog" className="p-0">
@@ -1647,7 +1902,6 @@ export default function AdminDashboard() {
                                         setBlogType(item.type);
                                         setBlogImage(item.image);
                                         setBlogStatus(item.status === 'draft' ? 'draft' : 'published');
-                                        // Simplified block reconstruction from HTML
                                         setBlocks([{ id: 'edit-1', type: 'text', content: item.body, alignment: 'justify' }]);
                                         setActiveForm('blog');
                                         setActiveTab('content');
@@ -1655,8 +1909,8 @@ export default function AdminDashboard() {
                                         <Pencil className="h-4 w-4" />
                                       </Button>
 
-                                      {/* Eliminar */}
-                                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Eliminar crónica" onClick={() => deleteDoc(doc(firestore, 'contentItems', item.id))}>
+                                      {/* Eliminar con confirmación */}
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Eliminar crónica" onClick={() => deleteBlogPost(item.id)}>
                                         <Trash2 className="h-4 w-4" />
                                       </Button>
                                     </div>
@@ -1669,93 +1923,337 @@ export default function AdminDashboard() {
                     </Table>
                   </TabsContent>
 
+                  {/* PROYECTOS */}
                   <TabsContent value="inv-proj" className="p-0">
+                    <div className="p-6 bg-muted/10 border-b flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Proyectos registrados ({projectItems?.length || 0})</span>
+                      <Button size="sm" className="text-xs h-8 gap-1.5" onClick={() => {
+                        cancelEditing();
+                        setActiveForm('project');
+                        setActiveTab('content');
+                      }}>
+                        <Plus className="h-3.5 w-3.5" /> Nuevo Proyecto
+                      </Button>
+                    </div>
                     <Table>
                       <TableBody>
                         {(!projectItems || projectItems.length === 0) ? (
                           <TableRow><TableCell colSpan={2} className="py-12 text-center text-muted-foreground text-sm">No hay proyectos registrados.</TableCell></TableRow>
                         ) : (
-                          projectItems.map(item => (
-                            <TableRow key={item.id} className="border-b">
-                              <TableCell className="pl-12 py-6">
-                                <div className="flex items-center gap-6">
-                                  {item.image && (
-                                    <div className="relative w-16 h-12 rounded-sm overflow-hidden bg-muted flex-shrink-0 border">
-                                      <Image src={item.image} alt={item.title} fill className="object-cover" />
+                          projectItems.map(item => {
+                            const isDraft = item.status === 'draft';
+                            return (
+                              <TableRow key={item.id} className="border-b hover:bg-muted/5">
+                                <TableCell className="pl-8 py-5">
+                                  <div className="flex items-center gap-5">
+                                    {item.image && (
+                                      <div className="relative w-16 h-12 rounded-sm overflow-hidden bg-muted flex-shrink-0 border">
+                                        <Image src={item.image} alt={item.title} fill className="object-cover" />
+                                      </div>
+                                    )}
+                                    <div className="space-y-1">
+                                      <div className="flex items-center gap-2.5">
+                                        <h4 className="font-headline text-base font-bold">{item.title}</h4>
+                                        {isDraft ? (
+                                          <Badge variant="outline" className="border-amber-500/60 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">
+                                            Borrador
+                                          </Badge>
+                                        ) : (
+                                          <Badge variant="outline" className="border-emerald-500/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">
+                                            Publicado
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground">{item.category} • {item.description}</p>
                                     </div>
-                                  )}
-                                  <div>
-                                    <h4 className="font-headline text-lg font-bold">{item.title}</h4>
-                                    <p className="text-xs text-muted-foreground">{item.category}</p>
                                   </div>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right pr-12">
-                                <div className="flex items-center justify-end gap-2">
-                                  <Button variant="ghost" size="icon" onClick={() => deleteDoc(doc(firestore, 'projects', item.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
+                                </TableCell>
+                                <TableCell className="text-right pr-8">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => toggleProjectStatus(item.id, item.status)}
+                                      className={cn("h-8 text-xs font-semibold px-2.5", isDraft ? "border-emerald-500/40 text-emerald-700" : "border-amber-500/40 text-amber-700")}
+                                    >
+                                      {isDraft ? <span className="flex items-center gap-1"><Check className="h-3 w-3" /> Publicar</span> : <span>Despublicar</span>}
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEditProject(item)} title="Editar proyecto">
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => deleteProject(item.id)} title="Eliminar proyecto">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
                         )}
                       </TableBody>
                     </Table>
                   </TabsContent>
 
+                  {/* TESTIMONIOS */}
                   <TabsContent value="inv-test" className="p-0">
+                    <div className="p-6 bg-muted/10 border-b flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Testimonios de confianza ({testimonialItems?.length || 0})</span>
+                      <Button size="sm" className="text-xs h-8 gap-1.5" onClick={() => {
+                        cancelEditing();
+                        setActiveForm('testimonial');
+                        setActiveTab('content');
+                      }}>
+                        <Plus className="h-3.5 w-3.5" /> Nuevo Testimonio
+                      </Button>
+                    </div>
                     <Table>
                       <TableBody>
                         {(!testimonialItems || testimonialItems.length === 0) ? (
                           <TableRow><TableCell colSpan={2} className="py-12 text-center text-muted-foreground text-sm">No hay testimonios registrados.</TableCell></TableRow>
                         ) : (
-                          testimonialItems.map(item => (
-                            <TableRow key={item.id} className="border-b">
-                              <TableCell className="pl-12 py-6">
-                                <div>
-                                  <h4 className="font-headline text-base font-bold italic">&ldquo;{item.quote}&rdquo;</h4>
-                                  <p className="text-xs text-muted-foreground mt-1">{item.authorName} — {item.authorTitle}</p>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right pr-12">
-                                <div className="flex items-center justify-end gap-2">
-                                  <Button variant="ghost" size="icon" onClick={() => deleteDoc(doc(firestore, 'testimonials', item.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
+                          testimonialItems.map(item => {
+                            const isDraft = item.status === 'draft';
+                            return (
+                              <TableRow key={item.id} className="border-b hover:bg-muted/5">
+                                <TableCell className="pl-8 py-5">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-2.5">
+                                      <h4 className="font-headline text-base font-bold italic">&ldquo;{item.quote}&rdquo;</h4>
+                                      {isDraft ? (
+                                        <Badge variant="outline" className="border-amber-500/60 bg-amber-50 text-amber-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Borrador</Badge>
+                                      ) : (
+                                        <Badge variant="outline" className="border-emerald-500/60 bg-emerald-50 text-emerald-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Publicado</Badge>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">{item.authorName} — {item.authorTitle}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right pr-8">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => toggleTestimonialStatus(item.id, item.status)}
+                                      className={cn("h-8 text-xs font-semibold px-2.5", isDraft ? "border-emerald-500/40 text-emerald-700" : "border-amber-500/40 text-amber-700")}
+                                    >
+                                      {isDraft ? <span className="flex items-center gap-1"><Check className="h-3 w-3" /> Publicar</span> : <span>Despublicar</span>}
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEditTestimonial(item)} title="Editar testimonio">
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => deleteTestimonial(item.id)} title="Eliminar testimonio">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
                         )}
                       </TableBody>
                     </Table>
                   </TabsContent>
 
+                  {/* PODCASTS */}
                   <TabsContent value="inv-pod" className="p-0">
+                    <div className="p-6 bg-muted/10 border-b flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Podcasts en Firestore ({podItems?.length || 0})</span>
+                      <Button size="sm" className="text-xs h-8 gap-1.5" onClick={() => {
+                        cancelEditing();
+                        setActiveForm('podcast');
+                        setActiveTab('content');
+                      }}>
+                        <Plus className="h-3.5 w-3.5" /> Nuevo Podcast
+                      </Button>
+                    </div>
                     <Table>
                       <TableBody>
                         {(!podItems || podItems.length === 0) ? (
                           <TableRow><TableCell colSpan={2} className="py-12 text-center text-muted-foreground text-sm">No hay podcasts registrados en Firestore.</TableCell></TableRow>
                         ) : (
-                          podItems.map(item => (
-                            <TableRow key={item.id} className="border-b">
-                              <TableCell className="pl-12 py-6">
-                                <div className="flex items-center gap-6">
-                                  {item.image && (
-                                    <div className="relative w-12 h-12 rounded-sm overflow-hidden bg-muted flex-shrink-0 border">
-                                      <Image src={item.image} alt={item.title} fill className="object-cover" />
+                          podItems.map(item => {
+                            const isDraft = item.status === 'draft';
+                            return (
+                              <TableRow key={item.id} className="border-b hover:bg-muted/5">
+                                <TableCell className="pl-8 py-5">
+                                  <div className="flex items-center gap-5">
+                                    {item.image && (
+                                      <div className="relative w-12 h-12 rounded-sm overflow-hidden bg-muted flex-shrink-0 border">
+                                        <Image src={item.image} alt={item.title} fill className="object-cover" />
+                                      </div>
+                                    )}
+                                    <div className="space-y-1">
+                                      <div className="flex items-center gap-2.5">
+                                        <h4 className="font-headline text-base font-bold">{item.title}</h4>
+                                        {isDraft ? (
+                                          <Badge variant="outline" className="border-amber-500/60 bg-amber-50 text-amber-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Borrador</Badge>
+                                        ) : (
+                                          <Badge variant="outline" className="border-emerald-500/60 bg-emerald-50 text-emerald-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Publicado</Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground">{item.guest ? `Con ${item.guest} • ` : ''}{item.description}</p>
                                     </div>
-                                  )}
-                                  <div>
-                                    <h4 className="font-headline text-base font-bold">{item.title}</h4>
-                                    {item.guest && <p className="text-xs text-muted-foreground">Con {item.guest}</p>}
                                   </div>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right pr-12">
-                                <div className="flex items-center justify-end gap-2">
-                                  <Button variant="ghost" size="icon" onClick={() => deleteDoc(doc(firestore, 'podcasts', item.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
+                                </TableCell>
+                                <TableCell className="text-right pr-8">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => togglePodcastStatus(item.id, item.status)}
+                                      className={cn("h-8 text-xs font-semibold px-2.5", isDraft ? "border-emerald-500/40 text-emerald-700" : "border-amber-500/40 text-amber-700")}
+                                    >
+                                      {isDraft ? <span className="flex items-center gap-1"><Check className="h-3 w-3" /> Publicar</span> : <span>Despublicar</span>}
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEditPodcast(item)} title="Editar podcast">
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => deletePodcast(item.id)} title="Eliminar podcast">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TabsContent>
+
+                  {/* VIDEOS Y MULTIMEDIA */}
+                  <TabsContent value="inv-vid" className="p-0">
+                    <div className="p-6 bg-muted/10 border-b flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Videos y Contenidos Audiovisuales ({videoItems?.length || 0})</span>
+                      <Button size="sm" className="text-xs h-8 gap-1.5" onClick={() => {
+                        cancelEditing();
+                        setActiveForm('video');
+                        setActiveTab('content');
+                      }}>
+                        <Plus className="h-3.5 w-3.5" /> Nuevo Video
+                      </Button>
+                    </div>
+                    <Table>
+                      <TableBody>
+                        {(!videoItems || videoItems.length === 0) ? (
+                          <TableRow><TableCell colSpan={2} className="py-12 text-center text-muted-foreground text-sm">No hay videos registrados en Firestore.</TableCell></TableRow>
+                        ) : (
+                          videoItems.map(item => {
+                            const isDraft = item.status === 'draft';
+                            return (
+                              <TableRow key={item.id} className="border-b hover:bg-muted/5">
+                                <TableCell className="pl-8 py-5">
+                                  <div className="flex items-center gap-5">
+                                    {(item.image || item.youtubeId) && (
+                                      <div className="relative w-16 h-12 rounded-sm overflow-hidden bg-muted flex-shrink-0 border">
+                                        <Image src={item.image || `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg`} alt={item.title} fill className="object-cover" />
+                                      </div>
+                                    )}
+                                    <div className="space-y-1">
+                                      <div className="flex items-center gap-2.5">
+                                        <h4 className="font-headline text-base font-bold">{item.title}</h4>
+                                        <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">
+                                          {item.platform || 'Video'}
+                                        </Badge>
+                                        {isDraft ? (
+                                          <Badge variant="outline" className="border-amber-500/60 bg-amber-50 text-amber-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Borrador</Badge>
+                                        ) : (
+                                          <Badge variant="outline" className="border-emerald-500/60 bg-emerald-50 text-emerald-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Publicado</Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground line-clamp-1">{item.url}</p>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right pr-8">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => toggleVideoStatus(item.id, item.status)}
+                                      className={cn("h-8 text-xs font-semibold px-2.5", isDraft ? "border-emerald-500/40 text-emerald-700" : "border-amber-500/40 text-amber-700")}
+                                    >
+                                      {isDraft ? <span className="flex items-center gap-1"><Check className="h-3 w-3" /> Publicar</span> : <span>Despublicar</span>}
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEditVideo(item)} title="Editar video">
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => deleteVideo(item.id)} title="Eliminar video">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TabsContent>
+
+                  {/* RECURSOS */}
+                  <TabsContent value="inv-res" className="p-0">
+                    <div className="p-6 bg-muted/10 border-b flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Recursos y Toolkits Descargables ({resourceItems?.length || 0})</span>
+                      <Button size="sm" className="text-xs h-8 gap-1.5" onClick={() => {
+                        cancelEditing();
+                        setActiveForm('resource');
+                        setActiveTab('content');
+                      }}>
+                        <Plus className="h-3.5 w-3.5" /> Nuevo Recurso
+                      </Button>
+                    </div>
+                    <Table>
+                      <TableBody>
+                        {(!resourceItems || resourceItems.length === 0) ? (
+                          <TableRow><TableCell colSpan={2} className="py-12 text-center text-muted-foreground text-sm">No hay recursos en la biblioteca.</TableCell></TableRow>
+                        ) : (
+                          resourceItems.map(item => {
+                            const isDraft = item.status === 'draft';
+                            return (
+                              <TableRow key={item.id} className="border-b hover:bg-muted/5">
+                                <TableCell className="pl-8 py-5">
+                                  <div className="flex items-center gap-5">
+                                    {item.coverImage && (
+                                      <div className="relative w-12 h-16 rounded-sm overflow-hidden bg-muted flex-shrink-0 border shadow-sm">
+                                        <Image src={item.coverImage} alt={item.title} fill className="object-cover" />
+                                      </div>
+                                    )}
+                                    <div className="space-y-1">
+                                      <div className="flex items-center gap-2.5">
+                                        <h4 className="font-headline text-base font-bold">{item.title}</h4>
+                                        <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">{item.category}</Badge>
+                                        {isDraft ? (
+                                          <Badge variant="outline" className="border-amber-500/60 bg-amber-50 text-amber-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Borrador</Badge>
+                                        ) : (
+                                          <Badge variant="outline" className="border-emerald-500/60 bg-emerald-50 text-emerald-800 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5">Publicado</Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground">{item.format || 'PDF'} • {item.downloadsCount || 0} descargas</p>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right pr-8">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => toggleResourceStatus(item.id, item.status)}
+                                      className={cn("h-8 text-xs font-semibold px-2.5", isDraft ? "border-emerald-500/40 text-emerald-700" : "border-amber-500/40 text-amber-700")}
+                                    >
+                                      {isDraft ? <span className="flex items-center gap-1"><Check className="h-3 w-3" /> Publicar</span> : <span>Despublicar</span>}
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEditResource(item)} title="Editar recurso">
+                                      <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => deleteResource(item.id)} title="Eliminar recurso">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
                         )}
                       </TableBody>
                     </Table>
@@ -1774,6 +2272,7 @@ export default function AdminDashboard() {
                     <Button variant={activeForm === 'project' ? 'default' : 'outline'} className="justify-start h-16 px-8 text-[10px] font-bold uppercase tracking-widest rounded-sm" onClick={() => setActiveForm('project')}><Briefcase className="mr-4 h-4" /> Proyecto</Button>
                     <Button variant={activeForm === 'testimonial' ? 'default' : 'outline'} className="justify-start h-16 px-8 text-[10px] font-bold uppercase tracking-widest rounded-sm" onClick={() => setActiveForm('testimonial')}><QuoteIcon className="mr-4 h-4" /> Testimonio</Button>
                     <Button variant={activeForm === 'podcast' ? 'default' : 'outline'} className="justify-start h-16 px-8 text-[10px] font-bold uppercase tracking-widest rounded-sm" onClick={() => setActiveForm('podcast')}><Radio className="mr-4 h-4" /> Podcast</Button>
+                    <Button variant={activeForm === 'video' ? 'default' : 'outline'} className="justify-start h-16 px-8 text-[10px] font-bold uppercase tracking-widest rounded-sm" onClick={() => setActiveForm('video')}><Video className="mr-4 h-4" /> Video / Multimedia</Button>
                  </div>
                </div>
 
@@ -1993,11 +2492,42 @@ export default function AdminDashboard() {
                    </div>
                  )}
 
+                 {/* Banner de Edición Activa */}
+                 {editingId && (
+                   <div className="bg-primary/10 border border-primary/30 p-4 rounded-sm flex items-center justify-between mb-8">
+                     <div className="flex items-center gap-3">
+                       <Pencil className="h-4 w-4 text-primary animate-pulse" />
+                       <span className="text-xs font-bold text-foreground">
+                         Modo Edición Activo (ID: {editingId})
+                       </span>
+                     </div>
+                     <Button variant="outline" size="sm" onClick={cancelEditing} className="h-8 text-[10px] uppercase font-bold tracking-wider">
+                       Cancelar edición / Crear nuevo
+                     </Button>
+                   </div>
+                 )}
+
                  {activeForm === 'project' && (
                    <Card className="p-10 space-y-8 shadow-xl animate-in slide-in-from-right-8">
-                      <div className="flex items-center gap-4 border-b pb-6">
-                        <Briefcase className="h-6 w-6 text-primary" />
-                        <h3 className="text-xl font-bold font-headline">Nuevo Proyecto</h3>
+                      <div className="flex items-center justify-between border-b pb-6">
+                        <div className="flex items-center gap-4">
+                          <Briefcase className="h-6 w-6 text-primary" />
+                          <h3 className="text-xl font-bold font-headline">{editingId ? 'Editar Proyecto' : 'Nuevo Proyecto'}</h3>
+                        </div>
+                        <Badge variant="outline" className={cn("text-[10px] font-bold uppercase", projStatus === 'draft' ? "border-amber-500 text-amber-700 bg-amber-50" : "border-emerald-500 text-emerald-700 bg-emerald-50")}>
+                          {projStatus === 'draft' ? 'Borrador' : 'Publicado'}
+                        </Badge>
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase opacity-60">Estado de Publicación</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button type="button" variant={projStatus === 'published' ? 'default' : 'outline'} size="sm" onClick={() => setProjStatus('published')} className="text-xs">
+                            <Check className="h-3.5 w-3.5 mr-2" /> Público en Portafolio
+                          </Button>
+                          <Button type="button" variant={projStatus === 'draft' ? 'default' : 'outline'} size="sm" onClick={() => setProjStatus('draft')} className="text-xs">
+                            Borrador Interno
+                          </Button>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Título del Proyecto</Label><Input value={projTitle} onChange={e => setProjTitle(e.target.value)} /></div>
@@ -2007,7 +2537,9 @@ export default function AdminDashboard() {
                       <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Enlace Externo</Label><Input value={projLink} onChange={e => setProjLink(e.target.value)} placeholder="https://..." /></div>
                       <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Descripción Técnica</Label><Textarea value={projDesc} onChange={e => setProjDesc(e.target.value)} rows={4} /></div>
                       <div className="flex gap-4 pt-4">
-                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={saveProject} disabled={isSaving}>Guardar Proyecto</Button>
+                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={() => saveProject()} disabled={isSaving}>
+                          {isSaving ? 'Guardando...' : (editingId ? 'Actualizar Proyecto' : 'Guardar y Publicar Proyecto')}
+                        </Button>
                         <Button variant="ghost" onClick={cancelEditing}>Cancelar</Button>
                       </div>
                    </Card>
@@ -2015,17 +2547,35 @@ export default function AdminDashboard() {
 
                  {activeForm === 'testimonial' && (
                    <Card className="p-10 space-y-8 shadow-xl animate-in slide-in-from-right-8">
-                      <div className="flex items-center gap-4 border-b pb-6">
-                        <QuoteIcon className="h-6 w-6 text-primary" />
-                        <h3 className="text-xl font-bold font-headline">Testimonio de Confianza</h3>
+                      <div className="flex items-center justify-between border-b pb-6">
+                        <div className="flex items-center gap-4">
+                          <QuoteIcon className="h-6 w-6 text-primary" />
+                          <h3 className="text-xl font-bold font-headline">{editingId ? 'Editar Testimonio' : 'Nuevo Testimonio de Confianza'}</h3>
+                        </div>
+                        <Badge variant="outline" className={cn("text-[10px] font-bold uppercase", testStatus === 'draft' ? "border-amber-500 text-amber-700 bg-amber-50" : "border-emerald-500 text-emerald-700 bg-emerald-50")}>
+                          {testStatus === 'draft' ? 'Borrador' : 'Publicado'}
+                        </Badge>
                       </div>
-                      <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Cita / Palabra de Cliente</Label><Textarea value={testQuote} onChange={e => setTestQuote(e.target.value)} rows={5} placeholder="Lo que dicen de nosotros..." /></div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase opacity-60">Estado de Publicación</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button type="button" variant={testStatus === 'published' ? 'default' : 'outline'} size="sm" onClick={() => setTestStatus('published')} className="text-xs">
+                            <Check className="h-3.5 w-3.5 mr-2" /> Visible en Mirada
+                          </Button>
+                          <Button type="button" variant={testStatus === 'draft' ? 'default' : 'outline'} size="sm" onClick={() => setTestStatus('draft')} className="text-xs">
+                            Borrador Interno
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Cita / Palabra de Cliente *</Label><Textarea value={testQuote} onChange={e => setTestQuote(e.target.value)} rows={5} placeholder="Lo que dicen de nosotros..." /></div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Autor (Nombre)</Label><Input value={testAuthorName} onChange={e => setTestAuthorName(e.target.value)} /></div>
+                        <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Autor (Nombre) *</Label><Input value={testAuthorName} onChange={e => setTestAuthorName(e.target.value)} /></div>
                         <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Cargo / Organización</Label><Input value={testAuthorTitle} onChange={e => setTestAuthorTitle(e.target.value)} /></div>
                       </div>
                       <div className="flex gap-4 pt-4">
-                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={saveTestimonial} disabled={isSaving}>Guardar Testimonio</Button>
+                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={() => saveTestimonial()} disabled={isSaving}>
+                          {isSaving ? 'Guardando...' : (editingId ? 'Actualizar Testimonio' : 'Guardar Testimonio')}
+                        </Button>
                         <Button variant="ghost" onClick={cancelEditing}>Cancelar</Button>
                       </div>
                    </Card>
@@ -2033,9 +2583,25 @@ export default function AdminDashboard() {
 
                  {activeForm === 'podcast' && (
                    <Card className="p-10 space-y-8 shadow-xl animate-in slide-in-from-right-8">
-                      <div className="flex items-center gap-4 border-b pb-6">
-                        <Radio className="h-6 w-6 text-primary" />
-                        <h3 className="text-xl font-bold font-headline">Publicar Episodio</h3>
+                      <div className="flex items-center justify-between border-b pb-6">
+                        <div className="flex items-center gap-4">
+                          <Radio className="h-6 w-6 text-primary" />
+                          <h3 className="text-xl font-bold font-headline">{editingId ? 'Editar Episodio de Podcast' : 'Publicar Nuevo Episodio de Podcast'}</h3>
+                        </div>
+                        <Badge variant="outline" className={cn("text-[10px] font-bold uppercase", podStatus === 'draft' ? "border-amber-500 text-amber-700 bg-amber-50" : "border-emerald-500 text-emerald-700 bg-emerald-50")}>
+                          {podStatus === 'draft' ? 'Borrador' : 'Publicado'}
+                        </Badge>
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase opacity-60">Estado de Publicación</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button type="button" variant={podStatus === 'published' ? 'default' : 'outline'} size="sm" onClick={() => setPodStatus('published')} className="text-xs">
+                            <Check className="h-3.5 w-3.5 mr-2" /> Visible en Multimedia
+                          </Button>
+                          <Button type="button" variant={podStatus === 'draft' ? 'default' : 'outline'} size="sm" onClick={() => setPodStatus('draft')} className="text-xs">
+                            Borrador Interno
+                          </Button>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Título del Episodio</Label><Input value={podTitle} onChange={e => setPodTitle(e.target.value)} /></div>
@@ -2045,7 +2611,71 @@ export default function AdminDashboard() {
                       <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">URL Imagen Cuadrada</Label><Input value={podImage} onChange={e => setPodImage(e.target.value)} /></div>
                       <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Descripción Corta</Label><Textarea value={podDescription} onChange={e => setPodDescription(e.target.value)} /></div>
                       <div className="flex gap-4 pt-4">
-                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={savePodcast} disabled={isSaving}>Publicar Podcast</Button>
+                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={() => savePodcast()} disabled={isSaving}>
+                          {isSaving ? 'Guardando...' : (editingId ? 'Actualizar Podcast' : 'Guardar y Publicar Podcast')}
+                        </Button>
+                        <Button variant="ghost" onClick={cancelEditing}>Cancelar</Button>
+                      </div>
+                   </Card>
+                 )}
+
+                 {/* FORMULARIO DE VIDEO Y MULTIMEDIA */}
+                 {activeForm === 'video' && (
+                   <Card className="p-10 space-y-8 shadow-xl animate-in slide-in-from-right-8">
+                      <div className="flex items-center justify-between border-b pb-6">
+                        <div className="flex items-center gap-4">
+                          <Video className="h-6 w-6 text-primary" />
+                          <h3 className="text-xl font-bold font-headline">
+                            {editingId ? 'Editar Contenido Audiovisual' : 'Publicar Nuevo Video / Contenido Audiovisual'}
+                          </h3>
+                        </div>
+                        <Badge variant="outline" className={cn("text-[10px] font-bold uppercase", vidStatus === 'draft' ? "border-amber-500 text-amber-700 bg-amber-50" : "border-emerald-500 text-emerald-700 bg-emerald-50")}>
+                          {vidStatus === 'draft' ? 'Borrador' : 'Publicado'}
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase opacity-60">Estado de Publicación</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button type="button" variant={vidStatus === 'published' ? 'default' : 'outline'} size="sm" onClick={() => setVidStatus('published')} className="text-xs">
+                            <Check className="h-3.5 w-3.5 mr-2" /> Visible en Multimedia
+                          </Button>
+                          <Button type="button" variant={vidStatus === 'draft' ? 'default' : 'outline'} size="sm" onClick={() => setVidStatus('draft')} className="text-xs">
+                            Borrador Interno
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-bold uppercase">Título del Video *</Label>
+                          <Input value={vidTitle} onChange={e => setVidTitle(e.target.value)} placeholder="Ej: COP 16 - Diálogos de Cambio" />
+                        </div>
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-bold uppercase">Plataforma</Label>
+                          <Input value={vidPlatform} onChange={e => setVidPlatform(e.target.value)} placeholder="YouTube, Vimeo, etc." />
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase">URL del Video (YouTube o Vimeo) *</Label>
+                        <Input value={vidUrl} onChange={e => setVidUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=0DmyalU2zL4" />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase">URL Miniatura Personalizada (Opcional)</Label>
+                        <Input value={vidImage} onChange={e => setVidImage(e.target.value)} placeholder="Si se deja vacío, se extraerá de YouTube automáticamente" />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase">Descripción / Sinopsis</Label>
+                        <Textarea value={vidDescription} onChange={e => setVidDescription(e.target.value)} rows={3} placeholder="Breve reseña del contenido o participantes..." />
+                      </div>
+
+                      <div className="flex gap-4 pt-4">
+                        <Button className="flex-1 h-16 bg-primary text-white text-[10px] font-bold uppercase tracking-widest hover:bg-primary/90" onClick={() => saveVideo()} disabled={isSaving}>
+                          {isSaving ? 'Guardando...' : (editingId ? 'Actualizar Video' : 'Guardar y Publicar Video')}
+                        </Button>
                         <Button variant="ghost" onClick={cancelEditing}>Cancelar</Button>
                       </div>
                    </Card>
@@ -2053,15 +2683,32 @@ export default function AdminDashboard() {
 
                  {activeForm === 'resource' && (
                    <Card className="p-10 space-y-8 shadow-xl animate-in slide-in-from-right-8">
-                      <div className="flex items-center gap-4 border-b pb-6">
-                        <FileDown className="h-6 w-6 text-primary" />
-                        <div>
-                          <h3 className="text-xl font-bold font-headline">
-                            {editingId ? 'Editar Recurso Descargable' : 'Publicar Nuevo Recurso / Toolkit'}
-                          </h3>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            Publica toolkits, guías metodológicas o manifiestos que aparecerán en la biblioteca pública con contador de descargas.
-                          </p>
+                      <div className="flex items-center justify-between border-b pb-6">
+                        <div className="flex items-center gap-4">
+                          <FileDown className="h-6 w-6 text-primary" />
+                          <div>
+                            <h3 className="text-xl font-bold font-headline">
+                              {editingId ? 'Editar Recurso Descargable' : 'Publicar Nuevo Recurso / Toolkit'}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Publica toolkits, guías metodológicas o manifiestos en la biblioteca pública.
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className={cn("text-[10px] font-bold uppercase", resStatus === 'draft' ? "border-amber-500 text-amber-700 bg-amber-50" : "border-emerald-500 text-emerald-700 bg-emerald-50")}>
+                          {resStatus === 'draft' ? 'Borrador' : 'Publicado'}
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase opacity-60">Estado de Publicación</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button type="button" variant={resStatus === 'published' ? 'default' : 'outline'} size="sm" onClick={() => setResStatus('published')} className="text-xs">
+                            <Check className="h-3.5 w-3.5 mr-2" /> Visible en Biblioteca
+                          </Button>
+                          <Button type="button" variant={resStatus === 'draft' ? 'default' : 'outline'} size="sm" onClick={() => setResStatus('draft')} className="text-xs">
+                            Borrador Interno
+                          </Button>
                         </div>
                       </div>
 

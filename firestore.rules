@@ -36,48 +36,57 @@ service cloud.firestore {
     // --- CONTENIDO EDITORIAL Y PORTAFOLIO ---
     match /contentItems/{id} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     match /podcasts/{id} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /projects/{id} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     match /resources/{id} {
       allow read: if true;
-      allow create, delete: if isSignedIn();
-      // Permite tanto al equipo como a los visitantes públicos actualizar el contador de descargas
-      allow update: if true;
+      allow create, delete: if isAdmin();
+      // Permite a administradores actualizar cualquier campo, y a visitantes públicos solo incrementar el contador de descargas
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloadsCount'])
+      );
     }
 
     match /recognitions/{id} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     match /testimonials/{id} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     match /featuredVideos/{id} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     match /siteSettings/{id} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // --- MENSAJES DE CONTACTO ---
     match /messages/{id} {
-      allow create: if true;
-      allow read, update, delete: if isSignedIn();
+      // Público solo puede crear mensajes con formato válido
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message']) &&
+                       request.resource.data.name is string &&
+                       request.resource.data.email is string &&
+                       request.resource.data.message is string;
+      // Solo administradores autorizados pueden consultar, marcar leídos o eliminar mensajes
+      allow read, update, delete: if isAdmin();
     }
 
     // Regla de cierre de seguridad

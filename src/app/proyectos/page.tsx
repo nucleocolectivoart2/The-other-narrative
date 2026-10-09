@@ -37,7 +37,8 @@ export default function ProyectosPage() {
     }
   ];
 
-  const displayProjects = (projects && projects.length > 0) ? projects : mockProjects;
+  const publishedProjects = (projects || []).filter((p: any) => p.status !== 'draft');
+  const displayProjects = publishedProjects.length > 0 ? publishedProjects : ((projects && projects.length > 0) ? [] : mockProjects);
 
   return (
     <main className="bg-background min-h-screen">
