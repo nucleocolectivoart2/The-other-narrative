@@ -1,29 +1,24 @@
-
-/**
- * FIREBASE SECURITY RULES - THE OTHER NARRATIVE
- * DEPLOYMENT TRIGGER: V17 - Authorized Team Emails and Messages Security
- */
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- FUNCIONES DE AYUDA ---
+    // --- FUNCIONES DE AYUDA DE AUTORIZACIÓN ---
 
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Autorización por email directo (Bootstrap de seguridad)
+    // Autorización por correo verificado de los miembros del equipo editorial
     function isAuthorizedEmail() {
-      return isSignedIn() && (
-        request.auth.token.email == 'angelamgomez@gmail.com' || 
-        request.auth.token.email == 'nucleo.colectivo.art@gmail.com' ||
-        request.auth.token.email == 'nucleo.colectivo.art2@gmail.com'
-      );
+      return isSignedIn() && 
+        request.auth.token.email != null && (
+          request.auth.token.email.lower() == 'angelamgomez@gmail.com' || 
+          request.auth.token.email.lower() == 'nucleo.colectivo.art@gmail.com' ||
+          request.auth.token.email.lower() == 'nucleo.colectivo.art2@gmail.com'
+        );
     }
 
-    // Verifica el rol administrativo en Firestore o por email directo
+    // Verifica rol de administrador en Firestore o por correo autorizado
     function isAdmin() {
       return isAuthorizedEmail() || (
         isSignedIn() && 
@@ -32,38 +27,61 @@ service cloud.firestore {
       );
     }
 
-    // --- REGLAS DE COLECCIONES ---
-
+    // --- ROLES ADMINISTRATIVOS ---
     match /adminRoles/{userId} {
-      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin(); 
+      allow read: if isSignedIn();
+      allow write: if isAuthorizedEmail(); 
     }
 
-    function allowPublicRead() {
-      return true;
+    // --- CONTENIDO EDITORIAL Y PORTAFOLIO ---
+    match /contentItems/{id} {
+      allow read: if true;
+      allow write: if isSignedIn();
     }
 
-    // Colecciones de Contenido: Lectura pública, escritura solo Admin
-    match /contentItems/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
-    match /podcasts/{id} { allow read: if true; allow write: if true; }
-    match /projects/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
-    match /resources/{id} { 
-      allow read: if allowPublicRead(); 
-      allow create, delete: if isAdmin(); 
-      allow update: if isAdmin() || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloadsCount']));
+    match /podcasts/{id} {
+      allow read, write: if true;
     }
-    match /recognitions/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
-    match /testimonials/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
-    match /featuredVideos/{id} { allow read: if allowPublicRead(); allow write: if isAdmin(); }
-    match /siteSettings/{id} { allow read: if allowPublicRead(); allow write: if true; }
 
-    // Mensajes de contacto: Cualquier usuario puede crear, solo admin puede leer/borrar
+    match /projects/{id} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /resources/{id} {
+      allow read: if true;
+      allow create, delete: if isSignedIn();
+      // Permite tanto al equipo como a los visitantes públicos actualizar el contador de descargas
+      allow update: if true;
+    }
+
+    match /recognitions/{id} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /testimonials/{id} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /featuredVideos/{id} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /siteSettings/{id} {
+      allow read, write: if true;
+    }
+
+    // --- MENSAJES DE CONTACTO ---
     match /messages/{id} {
       allow create: if true;
-      allow read, delete, update: if isAdmin();
+      allow read, update, delete: if isSignedIn();
     }
 
-    match /{path=**} {
+    // Regla de cierre de seguridad
+    match /{document=**} {
       allow read, write: if false;
     }
   }

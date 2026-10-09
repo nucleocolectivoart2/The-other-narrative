@@ -7,9 +7,7 @@ import {
   ArrowRight, 
   ChevronDown, 
   Play, 
-  Loader2,
-  Target,
-  Workflow
+  Loader2
 } from 'lucide-react';
 import {
   Dialog,
@@ -42,13 +40,20 @@ export default function HomePage() {
   };
 
   const heroVideoId = extractYouTubeId(settings.heroVideoId) || '0DmyalU2zL4';
-  const videos = (settings.featuredVideos && settings.featuredVideos.length > 0)
+  const rawVideos = (settings.featuredVideos && settings.featuredVideos.length > 0)
     ? settings.featuredVideos
     : [
-        { id: '0DmyalU2zL4', title: 'HAY FESTIVAL: Diálogos de Cambio' },
+        { id: '0DmyalU2zL4', title: 'COP 16' },
         { id: 'VzQC-PPZmKQ', title: 'Conferencia: Narrativas que Movilizan' },
         { id: 'JhQ_EpuoiOQ', title: 'Estrategia de Comunicación Responsable' }
       ];
+
+  const videos = rawVideos.map(video => {
+    if (video.id === '0DmyalU2zL4' && (!video.title || video.title.includes('HAY FESTIVAL') || video.title === 'Diálogos de Cambio')) {
+      return { ...video, title: 'COP 16' };
+    }
+    return video;
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-background relative selection:bg-primary/30 overflow-x-hidden">
@@ -207,25 +212,35 @@ export default function HomePage() {
 
       {/* Áreas de Trabajo */}
       <section id="areas" className="section-container py-24 sm:py-32 border-t"> 
-         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div className="space-y-8">
-              <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase">ÁREAS DE TRABAJO</span>
-              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-headline tracking-tighter">Impacto <br /><span className="italic font-normal text-primary">Estratégico.</span></h2>
-              <p className="text-lg font-light text-muted-foreground leading-relaxed max-w-md">
-                Nuestra visión integrada conecta la estrategia de impacto con la cultura organizacional y el liderazgo, transformando los conceptos en prácticas que generan valor para las organizaciones, la sociedad y su entorno.
+              <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase">
+                {settings.areasEyebrow || 'ÁREAS DE TRABAJO'}
+              </span>
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-headline tracking-tighter text-foreground">
+                {settings.areasTitle || 'Impacto'} <br />
+                <span className="italic font-normal text-primary">
+                  {settings.areasTitleHighlight || 'Estratégico.'}
+                </span>
+              </h2>
+              <p className="text-lg font-light text-muted-foreground leading-relaxed max-w-lg">
+                {settings.areasDescription || 'Nuestra visión integrada conecta la estrategia de impacto con la cultura organizacional y el liderazgo, transformando los conceptos en prácticas que generan valor para las organizaciones, la sociedad y su entorno.'}
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-              {[
-                { title: 'Estrategia', icon: <Target className="h-5 w-5" />, text: 'Alineación de negocio y hojas de ruta.' },
-                { title: 'Engagement', icon: <Workflow className="h-5 w-5" />, text: 'Estrategias para organizaciones de membresía.' },
-              ].map((item, idx) => (
-                <div key={idx} className="p-8 border bg-white rounded-sm hover:border-primary transition-all duration-500 group">
-                  <div className="h-10 w-10 bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">{item.icon}</div>
-                  <h4 className="text-xl font-bold font-headline mb-4">{item.title}</h4>
-                  <p className="text-xs text-muted-foreground font-light leading-relaxed">{item.text}</p>
-                </div>
-              ))}
+            
+            <div className="w-full">
+              <div className="relative aspect-[4/3] sm:aspect-[16/11] w-full overflow-hidden rounded-sm shadow-xl bg-muted group border border-border/40">
+                <Image
+                  src={settings.areasImage || "/images/impacto-estrategico.jpg"}
+                  alt="Impacto Estratégico - Áreas de Trabajo"
+                  fill
+                  referrerPolicy="no-referrer"
+                  className="object-cover group-hover:scale-105 transition-transform duration-[3000ms]"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+              </div>
             </div>
          </div>
       </section>

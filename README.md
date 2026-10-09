@@ -13,11 +13,11 @@ No creemos en comunicar por comunicar. Creemos en construir conversaciones que a
 
 ## 🛠 Áreas de Trabajo
 
-1.  **Estrategia y Priorización:** Alineación de negocio, hojas de ruta y arquitectura de mensajes.
-2.  **Organizaciones de Membresía:** Estrategias de engagement para gremios, cooperativas y asociaciones.
-3.  **Comunicación para la Sostenibilidad:** Storytelling de impacto y sensibilización interna/externa.
-4.  **Laboratorio Editorial:** Podcasts, libros digitales, revistas y liderazgo de pensamiento.
-5.  **Formación:** Conferencias y talleres sobre periodismo de soluciones y escritura estratégica.
+1.  **Comunicación Organizacional y Narrativa Estratégica:** Alineación de propósito y estrategia con conversaciones y narrativas que movilizan.
+2.  **Comunicación y Comunidades:** Fortalecimiento del sentido de pertenencia, participación y valor colectivo para gremios y asociaciones.
+3.  **Laboratorio Editorial:** Transformación del conocimiento técnico en productos editoriales (podcasts, libros digitales, newsletters).
+4.  **Formación y Capacitación:** Talleres y conferencias para equipos, líderes y creadores de contenido.
+5.  **Regeneración y Sostenibilidad:** Narrativas de impacto para la transición ecológica y social.
 
 ## 🔄 Metodología
 

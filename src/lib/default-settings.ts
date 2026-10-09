@@ -2,6 +2,7 @@ export interface FeaturedVideoItem {
   id: string;
   title: string;
   thumbnail?: string;
+  youtubeId?: string;
 }
 
 export interface SiteSettings {
@@ -24,6 +25,13 @@ export interface SiteSettings {
   missionText: string;
   missionQuote: string;
   missionImage: string;
+
+  // ÁREAS DE TRABAJO
+  areasEyebrow?: string;
+  areasTitle?: string;
+  areasTitleHighlight?: string;
+  areasDescription?: string;
+  areasImage?: string;
 
   // MULTIMEDIA DE PORTADA (3 videos)
   featuredVideos: FeaturedVideoItem[];
@@ -64,9 +72,16 @@ export const defaultSiteSettings: SiteSettings = {
   missionQuote: 'No creemos en comunicar por comunicar. Creemos en construir conversaciones que ayuden a generar valor para los negocios, la sociedad y el planeta.',
   missionImage: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/01_articular_realidades.png',
 
+  // ÁREAS DE TRABAJO
+  areasEyebrow: 'ÁREAS DE TRABAJO',
+  areasTitle: 'Impacto',
+  areasTitleHighlight: 'Estratégico.',
+  areasDescription: 'Nuestra visión integrada conecta la estrategia de impacto con la cultura organizacional y el liderazgo, transformando los conceptos en prácticas que generan valor para las organizaciones, la sociedad y su entorno.',
+  areasImage: '/images/impacto-estrategico.jpg',
+
   // MULTIMEDIA DE PORTADA
   featuredVideos: [
-    { id: '0DmyalU2zL4', title: 'HAY FESTIVAL: Diálogos de Cambio' },
+    { id: '0DmyalU2zL4', title: 'COP 16' },
     { id: 'VzQC-PPZmKQ', title: 'Conferencia: Narrativas que Movilizan' },
     { id: 'JhQ_EpuoiOQ', title: 'Estrategia de Comunicación Responsable' }
   ],

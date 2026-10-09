@@ -271,9 +271,9 @@ export default function AdminDashboard() {
   const testimonialsQuery = useMemoFirebase(() => query(collection(firestore, 'testimonials')), [firestore]);
   const { data: testimonialItems } = useCollection(testimonialsQuery);
   const messagesQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
+    if (!firestore || !user || !isAuthorized) return null;
     return query(collection(firestore, 'messages'), orderBy('createdAt', 'desc'));
-  }, [firestore, user]);
+  }, [firestore, user, isAuthorized]);
   const { data: messageItems } = useCollection(messagesQuery);
 
   // Configurador Global del Ecosistema
@@ -289,12 +289,19 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (remoteSettingsData && !hasInitializedEcosystem) {
+      const initialVideos = (remoteSettingsData.featuredVideos && remoteSettingsData.featuredVideos.length > 0)
+        ? remoteSettingsData.featuredVideos
+        : defaultSiteSettings.featuredVideos;
+
       setEcosystemSettings({
         ...defaultSiteSettings,
         ...remoteSettingsData,
-        featuredVideos: (remoteSettingsData.featuredVideos && remoteSettingsData.featuredVideos.length > 0)
-          ? remoteSettingsData.featuredVideos
-          : defaultSiteSettings.featuredVideos
+        featuredVideos: initialVideos.map(v => {
+          if ((v.id === '0DmyalU2zL4' || v.youtubeId === '0DmyalU2zL4') && (!v.title || v.title.includes('HAY FESTIVAL') || v.title === 'Diálogos de Cambio')) {
+            return { ...v, title: 'COP 16' };
+          }
+          return v;
+        })
       });
       setHasInitializedEcosystem(true);
     }
@@ -1018,6 +1025,67 @@ export default function AdminDashboard() {
                         onChange={e => setEcosystemSettings(prev => ({ ...prev, missionQuote: e.target.value }))}
                         rows={3}
                         placeholder="No creemos en comunicar por comunicar..."
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* 2.1 ÁREAS DE TRABAJO (IMPACTO ESTRATÉGICO) */}
+                <Card className="rounded-sm border shadow-sm">
+                  <CardHeader className="border-b bg-muted/10 p-6 flex flex-row items-center justify-between">
+                    <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-3">
+                      <Briefcase className="h-4 w-4 text-primary" /> Áreas de Trabajo (Impacto Estratégico)
+                    </CardTitle>
+                    <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-widest">Fotografía & Textos</Badge>
+                  </CardHeader>
+                  <CardContent className="p-8 space-y-6">
+                    <p className="text-xs text-muted-foreground">
+                      Configura la imagen fotográfica editorial y los textos de la sección de Áreas de Trabajo en la página de inicio.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest">Etiqueta Superior</Label>
+                        <Input
+                          value={ecosystemSettings.areasEyebrow || ''}
+                          onChange={e => setEcosystemSettings(prev => ({ ...prev, areasEyebrow: e.target.value }))}
+                          placeholder="ÁREAS DE TRABAJO"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest">Título Principal</Label>
+                        <Input
+                          value={ecosystemSettings.areasTitle || ''}
+                          onChange={e => setEcosystemSettings(prev => ({ ...prev, areasTitle: e.target.value }))}
+                          placeholder="Impacto"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest">Resaltado (Cursiva)</Label>
+                        <Input
+                          value={ecosystemSettings.areasTitleHighlight || ''}
+                          onChange={e => setEcosystemSettings(prev => ({ ...prev, areasTitleHighlight: e.target.value }))}
+                          placeholder="Estratégico."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest">URL Imagen / Fotografía</Label>
+                      <Input
+                        value={ecosystemSettings.areasImage || ''}
+                        onChange={e => setEcosystemSettings(prev => ({ ...prev, areasImage: e.target.value }))}
+                        placeholder="/images/impacto-estrategico.jpg"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest">Descripción</Label>
+                      <Textarea
+                        value={ecosystemSettings.areasDescription || ''}
+                        onChange={e => setEcosystemSettings(prev => ({ ...prev, areasDescription: e.target.value }))}
+                        rows={3}
+                        placeholder="Nuestra visión integrada conecta la estrategia de impacto..."
                       />
                     </div>
                   </CardContent>

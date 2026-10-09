@@ -1,0 +1,155 @@
+{
+  "entities": {
+    "contentItem": {
+      "title": "Content Item",
+      "description": "Editorial article, essay, or chronicle",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "slug": { "type": "string" },
+        "image": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorTitle": { "type": "string" },
+        "date": { "type": "string" }
+      },
+      "required": ["title", "type"]
+    },
+    "podcast": {
+      "title": "Podcast Episode",
+      "description": "Episode audio and metadata",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "url": { "type": "string" },
+        "guest": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["title", "url"]
+    },
+    "project": {
+      "title": "Project",
+      "description": "Portfolio initiative or collaborative project",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "link": { "type": "string" }
+      },
+      "required": ["title"]
+    },
+    "resource": {
+      "title": "Downloadable Resource",
+      "description": "Toolkit, guide, or publication resource",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "format": { "type": "string" },
+        "pages": { "type": "string" },
+        "downloadUrl": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "downloadsCount": { "type": "number" }
+      },
+      "required": ["title"]
+    },
+    "featuredVideo": {
+      "title": "Featured Video",
+      "description": "Curated video presentation or dialogue",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "platform": { "type": "string" },
+        "thumbnail": { "type": "string" }
+      },
+      "required": ["title", "url"]
+    },
+    "testimonial": {
+      "title": "Testimonial",
+      "description": "Quote and endorsement",
+      "type": "object",
+      "properties": {
+        "quote": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorTitle": { "type": "string" }
+      },
+      "required": ["quote", "authorName"]
+    },
+    "siteSetting": {
+      "title": "Site Settings",
+      "description": "Global website configuration and media settings",
+      "type": "object",
+      "properties": {
+        "brandName": { "type": "string" },
+        "heroVideoId": { "type": "string" }
+      }
+    },
+    "message": {
+      "title": "Contact Message",
+      "description": "User inquiry or collaboration request",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["name", "email", "message"]
+    },
+    "adminRole": {
+      "title": "Admin Role",
+      "description": "Role document defining administrative access",
+      "type": "object",
+      "properties": {
+        "isAdmin": { "type": "boolean" },
+        "email": { "type": "string" }
+      },
+      "required": ["isAdmin"]
+    }
+  },
+  "firestore": {
+    "/contentItems/{contentItemId}": {
+      "schema": "contentItem",
+      "description": "Articles, chronicles and editorial pieces"
+    },
+    "/podcasts/{podcastId}": {
+      "schema": "podcast",
+      "description": "Podcast episodes"
+    },
+    "/projects/{projectId}": {
+      "schema": "project",
+      "description": "Initiatives and projects"
+    },
+    "/resources/{resourceId}": {
+      "schema": "resource",
+      "description": "Editorial toolkits and downloadable materials"
+    },
+    "/featuredVideos/{videoId}": {
+      "schema": "featuredVideo",
+      "description": "Featured videos and conferences"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "testimonial",
+      "description": "Client and collaborator testimonials"
+    },
+    "/siteSettings/{settingId}": {
+      "schema": "siteSetting",
+      "description": "Global ecosystem settings"
+    },
+    "/messages/{messageId}": {
+      "schema": "message",
+      "description": "Inbound contact messages"
+    },
+    "/adminRoles/{userId}": {
+      "schema": "adminRole",
+      "description": "Administrator roles mapping"
+    }
+  }
+}

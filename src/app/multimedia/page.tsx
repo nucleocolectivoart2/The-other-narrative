@@ -28,7 +28,7 @@ const defaultVideos = [
   { 
     id: '0DmyalU2zL4', 
     url: 'https://www.youtube.com/watch?v=0DmyalU2zL4', 
-    title: 'HAY FESTIVAL: Diálogos de Cambio', 
+    title: 'COP 16', 
     thumbnail: 'https://img.youtube.com/vi/0DmyalU2zL4/hqdefault.jpg' 
   },
   { 
@@ -65,7 +65,13 @@ export default function MultimediaPage() {
     : allPodcasts.filter(p => p.showId === selectedShow || p.showName?.toLowerCase().includes(selectedShow.toLowerCase()));
 
   const { data: fbVideos, isLoading: isVidLoading } = useCollection(videosQuery);
-  const videos = (fbVideos && fbVideos.length > 0) ? fbVideos : defaultVideos;
+  const rawVideos = (fbVideos && fbVideos.length > 0) ? fbVideos : defaultVideos;
+  const videos = rawVideos.map((v: any) => {
+    if ((v.id === '0DmyalU2zL4' || v.url?.includes('0DmyalU2zL4')) && (!v.title || v.title.includes('HAY FESTIVAL') || v.title === 'Diálogos de Cambio')) {
+      return { ...v, title: 'COP 16' };
+    }
+    return v;
+  });
 
   const getYouTubeId = (url?: string) => {
     if (!url) return null;

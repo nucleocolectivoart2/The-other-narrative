@@ -18,9 +18,14 @@ export function useSiteSettings() {
     ...defaultSiteSettings,
     ...(remoteData || {}),
     // Ensure featuredVideos is properly populated
-    featuredVideos: (remoteData?.featuredVideos && remoteData.featuredVideos.length > 0)
+    featuredVideos: ((remoteData?.featuredVideos && remoteData.featuredVideos.length > 0)
       ? remoteData.featuredVideos
-      : defaultSiteSettings.featuredVideos
+      : defaultSiteSettings.featuredVideos).map(v => {
+        if ((v.id === '0DmyalU2zL4' || v.youtubeId === '0DmyalU2zL4') && (!v.title || v.title.includes('HAY FESTIVAL') || v.title === 'Diálogos de Cambio')) {
+          return { ...v, title: 'COP 16' };
+        }
+        return v;
+      })
   };
 
   return {
