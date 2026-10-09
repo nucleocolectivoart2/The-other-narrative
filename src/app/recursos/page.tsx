@@ -164,6 +164,9 @@ export default function RecursosPage() {
             Conocimiento Libre & Prácticas Vivas
           </span>
           <div className="max-w-3xl animate-in slide-in-from-bottom-8 duration-1000 delay-200">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-4">
+              <span>Sección en preparación — Próximo lanzamiento</span>
+            </div>
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold font-headline leading-[0.95] mb-6 tracking-tight">
               Biblioteca de <br />
               <span className="italic font-normal text-primary">Recursos.</span>
