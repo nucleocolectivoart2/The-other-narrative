@@ -32,8 +32,15 @@ export default function ConcienciaPage() {
     }
   ];
 
-  const publishedTestimonials = (testimonials || []).filter((t: any) => t.status !== 'draft');
-  const displayTestimonials = publishedTestimonials.length > 0 ? publishedTestimonials : ((testimonials && testimonials.length > 0) ? [] : mockTestimonials);
+  const publishedTestimonials = (testimonials || [])
+    .filter((t: any) => t.status !== 'draft')
+    .sort((a: any, b: any) => {
+      const timeA = a.createdAt?.seconds || a.createdAt || 0;
+      const timeB = b.createdAt?.seconds || b.createdAt || 0;
+      return timeB - timeA;
+    });
+
+  const displayTestimonials = publishedTestimonials.length > 0 ? publishedTestimonials : mockTestimonials;
 
   const odsIcons = [
     { num: 4, name: 'Educación de Calidad' },

@@ -7,7 +7,8 @@ import {
   ArrowRight, 
   ChevronDown, 
   Play, 
-  Loader2
+  Loader2,
+  Quote
 } from 'lucide-react';
 import {
   Dialog,
@@ -21,10 +22,42 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { extractYouTubeId } from '@/lib/default-settings';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query } from 'firebase/firestore';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0);
   const { settings } = useSiteSettings();
+  const firestore = useFirestore();
+
+  const testimonialsQuery = useMemoFirebase(() => query(collection(firestore, 'testimonials')), [firestore]);
+  const { data: testimonials } = useCollection(testimonialsQuery);
+
+  const mockTestimonials = [
+    {
+      id: 'mock-t1',
+      quote: 'Ángela tiene la capacidad de transformar los datos técnicos en una narrativa que no solo informa, sino que conecta con la esencia de lo que hacemos.',
+      authorName: 'Líder de Regeneración',
+      authorTitle: 'Organización Internacional'
+    },
+    {
+      id: 'mock-t2',
+      quote: 'The Other Narrative nos ayudó a encontrar nuestra propia voz en un entorno de comunicación saturado y complejo.',
+      authorName: 'Director Ejecutivo',
+      authorTitle: 'Gremio Nacional'
+    }
+  ];
+
+  const publishedTestimonials = (testimonials || [])
+    .filter((t: any) => t.status !== 'draft')
+    .sort((a: any, b: any) => {
+      const timeA = a.createdAt?.seconds || a.createdAt || 0;
+      const timeB = b.createdAt?.seconds || b.createdAt || 0;
+      return timeB - timeA;
+    });
+
+  const displayTestimonials = publishedTestimonials.length > 0 ? publishedTestimonials : mockTestimonials;
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -268,6 +301,46 @@ export default function HomePage() {
                ))}
             </div>
          </div>
+      </section>
+
+      {/* Voces de Confianza - Testimonios */}
+      <section className="py-24 sm:py-32 border-t bg-muted/10 relative overflow-hidden">
+        <div className="section-container">
+          <div className="max-w-4xl mx-auto space-y-16">
+            <div className="text-center space-y-4">
+              <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase">VOCES DE CONFIANZA</span>
+              <h2 className="text-3xl sm:text-5xl font-bold font-headline tracking-tighter">Impacto Narrativo</h2>
+              <p className="text-sm font-light text-muted-foreground uppercase tracking-widest">Lo que dicen las organizaciones con las que colaboramos</p>
+            </div>
+
+            <Carousel className="w-full">
+              <CarouselContent>
+                {displayTestimonials.map((testimonial) => (
+                  <CarouselItem key={testimonial.id}>
+                    <div className="p-8 sm:p-16 text-center space-y-8 bg-card/60 backdrop-blur-xs rounded-sm border border-border/40 shadow-sm">
+                      <Quote className="h-8 w-8 text-primary/30 mx-auto" />
+                      <p className="text-xl sm:text-2xl md:text-3xl font-light font-headline italic leading-relaxed text-foreground/85">
+                        &ldquo;{testimonial.quote}&rdquo;
+                      </p>
+                      <div className="space-y-1.5 pt-2">
+                        <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">{testimonial.authorName}</p>
+                        {testimonial.authorTitle && (
+                          <p className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">{testimonial.authorTitle}</p>
+                        )}
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {displayTestimonials.length > 1 && (
+                <div className="hidden md:block">
+                  <CarouselPrevious className="left-0 -translate-x-12" />
+                  <CarouselNext className="right-0 translate-x-12" />
+                </div>
+              )}
+            </Carousel>
+          </div>
+        </div>
       </section>
 
       {/* Multimedia */}

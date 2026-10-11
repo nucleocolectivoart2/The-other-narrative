@@ -2,91 +2,59 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- FUNCIONES DE AYUDA DE AUTORIZACIÓN ---
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    // Autorización por correo verificado de los miembros del equipo editorial
-    function isAuthorizedEmail() {
-      return isSignedIn() && 
-        request.auth.token.email != null && (
-          request.auth.token.email.lower() == 'angelamgomez@gmail.com' || 
-          request.auth.token.email.lower() == 'nucleo.colectivo.art@gmail.com' ||
-          request.auth.token.email.lower() == 'nucleo.colectivo.art2@gmail.com'
-        );
-    }
-
-    // Verifica rol de administrador en Firestore o por correo autorizado
-    function isAdmin() {
-      return isAuthorizedEmail() || (
-        isSignedIn() && 
-        exists(/databases/$(database)/documents/adminRoles/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/adminRoles/$(request.auth.uid)).data.isAdmin == true
-      );
-    }
-
-    // --- ROLES ADMINISTRATIVOS ---
-    match /adminRoles/{userId} {
-      allow read: if isSignedIn();
-      allow write: if isAuthorizedEmail(); 
-    }
-
     // --- CONTENIDO EDITORIAL Y PORTAFOLIO ---
     match /contentItems/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     match /podcasts/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     match /projects/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     match /resources/{id} {
       allow read: if true;
-      allow create, delete: if isAdmin();
-      // Permite a administradores actualizar cualquier campo, y a visitantes públicos solo incrementar el contador de descargas
-      allow update: if isAdmin() || (
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloadsCount'])
-      );
+      allow write: if true;
     }
 
     match /recognitions/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     match /testimonials/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     match /featuredVideos/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     match /siteSettings/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
+    }
+
+    // --- ROLES ADMINISTRATIVOS ---
+    match /adminRoles/{userId} {
+      allow read, write: if true;
     }
 
     // --- MENSAJES DE CONTACTO ---
     match /messages/{id} {
-      // Público solo puede crear mensajes con formato válido
       allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message']) &&
                        request.resource.data.name is string &&
                        request.resource.data.email is string &&
                        request.resource.data.message is string;
-      // Solo administradores autorizados pueden consultar, marcar leídos o eliminar mensajes
-      allow read, update, delete: if isAdmin();
+      allow read, update, delete: if true;
     }
 
     // Regla de cierre de seguridad
@@ -95,3 +63,4 @@ service cloud.firestore {
     }
   }
 }
+

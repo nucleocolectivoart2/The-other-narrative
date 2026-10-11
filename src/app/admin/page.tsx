@@ -671,7 +671,7 @@ export default function AdminDashboard() {
       toast({ variant: "destructive", title: "Campos requeridos", description: "La cita y el nombre del autor son obligatorios." });
       return;
     }
-    const finalStatus = targetStatus || testStatus;
+    const finalStatus = targetStatus || testStatus || 'published';
     setIsSaving(true);
     const data = {
       quote: testQuote.trim(),
@@ -682,13 +682,15 @@ export default function AdminDashboard() {
     };
 
     const action = editingId
-      ? updateDoc(doc(firestore, 'testimonials', editingId), data)
+      ? setDoc(doc(firestore, 'testimonials', editingId), data, { merge: true })
       : addDoc(collection(firestore, 'testimonials'), { ...data, createdAt: serverTimestamp() });
 
     action.then(() => {
       toast({ 
-        title: editingId ? "Testimonio Actualizado" : "Testimonio Guardado", 
-        description: editingId ? "Los cambios se guardaron con éxito." : "El testimonio se guardó en Firestore." 
+        title: editingId ? "Testimonio Actualizado" : "Testimonio Guardado y Publicado", 
+        description: finalStatus === 'published' 
+          ? "El testimonio ahora es visible en la plataforma pública." 
+          : "El testimonio se guardó como borrador interno." 
       });
       cancelEditing();
       setActiveTab('inventory');
@@ -707,11 +709,20 @@ export default function AdminDashboard() {
     setActiveTab('content');
   };
 
-  const toggleTestimonialStatus = async (id: string, currentStatus: string = 'published') => {
-    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+  const toggleTestimonialStatus = async (id: string, currentStatus?: string) => {
+    const isCurrentlyDraft = currentStatus === 'draft';
+    const newStatus = isCurrentlyDraft ? 'published' : 'draft';
     try {
-      await updateDoc(doc(firestore, 'testimonials', id), { status: newStatus, updatedAt: serverTimestamp() });
-      toast({ title: newStatus === 'published' ? "Testimonio Publicado" : "Movido a Borrador" });
+      await setDoc(doc(firestore, 'testimonials', id), { 
+        status: newStatus, 
+        updatedAt: serverTimestamp() 
+      }, { merge: true });
+      toast({ 
+        title: newStatus === 'published' ? "Testimonio Publicado" : "Movido a Borrador",
+        description: newStatus === 'published' 
+          ? "El testimonio ahora es visible públicamente en la plataforma." 
+          : "El testimonio quedó guardado como borrador interno." 
+      });
     } catch (err: any) {
       toast({ variant: "destructive", title: "Error al cambiar estado", description: err?.message });
     }
@@ -2572,11 +2583,25 @@ export default function AdminDashboard() {
                         <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Autor (Nombre) *</Label><Input value={testAuthorName} onChange={e => setTestAuthorName(e.target.value)} /></div>
                         <div className="space-y-3"><Label className="text-[10px] font-bold uppercase">Cargo / Organización</Label><Input value={testAuthorTitle} onChange={e => setTestAuthorTitle(e.target.value)} /></div>
                       </div>
-                      <div className="flex gap-4 pt-4">
-                        <Button className="flex-1 h-16 bg-secondary text-white text-[10px] font-bold uppercase" onClick={() => saveTestimonial()} disabled={isSaving}>
-                          {isSaving ? 'Guardando...' : (editingId ? 'Actualizar Testimonio' : 'Guardar Testimonio')}
+                      <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <Button 
+                          className="flex-1 h-16 bg-primary text-white text-[10px] font-bold uppercase tracking-widest gap-2 shadow-lg hover:brightness-110" 
+                          onClick={() => saveTestimonial('published')} 
+                          disabled={isSaving}
+                        >
+                          <Check className="h-4 w-4" />
+                          {isSaving ? 'Guardando...' : (editingId ? 'Actualizar y Publicar' : 'Publicar Testimonio Ahora')}
                         </Button>
-                        <Button variant="ghost" onClick={cancelEditing}>Cancelar</Button>
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          className="h-16 px-6 text-[10px] font-bold uppercase tracking-widest border-amber-500/40 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10" 
+                          onClick={() => saveTestimonial('draft')} 
+                          disabled={isSaving}
+                        >
+                          Guardar como Borrador
+                        </Button>
+                        <Button variant="ghost" onClick={cancelEditing} className="h-16">Cancelar</Button>
                       </div>
                    </Card>
                  )}
