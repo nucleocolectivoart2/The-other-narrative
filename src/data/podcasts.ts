@@ -6,6 +6,7 @@ export interface SpotifyShow {
   description: string;
   badge?: string;
   podimoUrl?: string;
+  spreakerUrl?: string;
   credits?: string;
 }
 
@@ -15,6 +16,7 @@ export const spotifyShows: SpotifyShow[] = [
     name: "The Other Narrative",
     url: "https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz",
     podimoUrl: "https://podimo.com/en/shows/the-other-narrative",
+    spreakerUrl: "https://www.spreaker.com/podcast/the-other-narrative--7175122",
     image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f118b74d043976031011e2bda",
     description: "Un podcast de periodismo de soluciones que explora las ideas, las personas y las organizaciones que están construyendo respuestas frente a los grandes desafíos de nuestro tiempo.",
     badge: "PODCAST · PERIODISMO DE SOLUCIONES",

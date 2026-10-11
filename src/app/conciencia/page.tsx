@@ -176,23 +176,23 @@ export default function ConcienciaPage() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 border-t border-b border-border/40 bg-muted/[0.04]">
-           <div className="max-w-4xl mx-auto space-y-12">
-              <div className="text-center space-y-3">
-                <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase">VOCES DE CONFIANZA</span>
-                <h3 className="text-3xl sm:text-4xl font-bold font-headline tracking-tighter">Impacto Narrativo</h3>
+        <section className="py-16 sm:py-20 border-t border-b border-border/40 bg-muted/[0.04]">
+           <div className="max-w-3xl mx-auto space-y-10">
+              <div className="text-center space-y-2.5">
+                <span className="text-primary font-bold text-[9px] sm:text-[10px] tracking-[0.6em] uppercase">VOCES DE CONFIANZA</span>
+                <h3 className="text-2xl sm:text-3xl font-bold font-headline tracking-tighter">Impacto Narrativo</h3>
               </div>
 
               <Carousel className="w-full">
                 <CarouselContent>
                   {displayTestimonials.map((testimonial) => (
                     <CarouselItem key={testimonial.id}>
-                      <div className="p-6 sm:p-12 text-center space-y-6">
-                        <Quote className="h-6 w-6 text-primary/25 mx-auto" />
-                        <p className="text-base sm:text-lg md:text-xl font-light font-headline italic leading-relaxed text-foreground/85 max-w-2xl sm:max-w-3xl mx-auto">
+                      <div className="p-4 sm:p-8 text-center space-y-5">
+                        <Quote className="h-5 w-5 text-primary/30 mx-auto" />
+                        <p className="text-sm sm:text-base md:text-[17px] font-light font-headline italic leading-relaxed text-foreground/85 max-w-xl sm:max-w-2xl mx-auto">
                           &ldquo;{testimonial.quote}&rdquo;
                         </p>
-                        <div className="space-y-1.5 pt-2">
+                        <div className="space-y-1 pt-1">
                           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">{testimonial.authorName}</p>
                           {testimonial.authorTitle && (
                             <p className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">{testimonial.authorTitle}</p>
@@ -203,8 +203,8 @@ export default function ConcienciaPage() {
                   ))}
                 </CarouselContent>
                 <div className="hidden md:block">
-                  <CarouselPrevious className="left-0 -translate-x-12" />
-                  <CarouselNext className="right-0 translate-x-12" />
+                  <CarouselPrevious className="left-0 -translate-x-10" />
+                  <CarouselNext className="right-0 translate-x-10" />
                 </div>
               </Carousel>
            </div>

@@ -275,6 +275,16 @@ export default function MultimediaPage() {
                   Escuchar en Podimo <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               )}
+              {mainShow.spreakerUrl && (
+                <a
+                  href={mainShow.spreakerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-editorial btn-editorial-outline h-11 px-6 text-[10px] tracking-[0.2em] font-bold inline-flex items-center gap-2"
+                >
+                  Escuchar en Spreaker <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -355,6 +365,136 @@ export default function MultimediaPage() {
               </div>
             </div>
 
+          </div>
+
+          {/* =========================================================================
+              BLOQUE: DISTRIBUCIÓN MULTIPLATAFORMA (OFICIAL THE OTHER NARRATIVE)
+             ========================================================================= */}
+          <div className="bg-card border border-border/70 rounded-sm p-8 sm:p-10 lg:p-12 shadow-sm space-y-8">
+            <div className="max-w-3xl space-y-3">
+              <div className="flex items-center gap-2 text-primary font-bold text-[10px] tracking-[0.4em] uppercase">
+                <Radio className="h-3.5 w-3.5" />
+                <span>DISTRIBUCIÓN MULTIPLATAFORMA</span>
+              </div>
+              
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-headline tracking-tight text-foreground">
+                Escucha The Other Narrative
+              </h3>
+              
+              <p className="text-base sm:text-lg text-foreground/80 font-light leading-relaxed">
+                Encuentra nuestras conversaciones, entrevistas y episodios sobre periodismo de soluciones, sostenibilidad, innovación y transformación en tu plataforma de escucha preferida.
+              </p>
+            </div>
+
+            {/* Tres tarjetas / botones en una sola fila en escritorio, adaptadas en dispositivos móviles */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 pt-2">
+              
+              {/* Spotify */}
+              <a
+                href="https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col justify-between p-6 sm:p-7 bg-background border border-border/70 hover:border-primary rounded-sm transition-all duration-300 hover:shadow-lg space-y-6"
+                aria-label="Escuchar The Other Narrative en Spotify (abre en ventana nueva)"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary">
+                      CANAL OFICIAL
+                    </span>
+                    <span className="h-6 px-2.5 bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-wider rounded-xs flex items-center">
+                      Audio HD
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-2xl font-bold font-headline tracking-tight text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
+                      Spotify
+                      <ExternalLink className="h-4 w-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 -translate-y-0.5 transition-all text-primary" />
+                    </h4>
+                    <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                      Reproduce todos los episodios, sigue el show y activa notificaciones de nuevas publicaciones.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border/40 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  <span>Abrir en Spotify</span>
+                  <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
+
+              {/* Podimo */}
+              <a
+                href="https://podimo.com/en/shows/the-other-narrative"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col justify-between p-6 sm:p-7 bg-background border border-border/70 hover:border-primary rounded-sm transition-all duration-300 hover:shadow-lg space-y-6"
+                aria-label="Escuchar The Other Narrative en Podimo (abre en ventana nueva)"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary">
+                      PLATAFORMA ASOCIADA
+                    </span>
+                    <span className="h-6 px-2.5 bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-wider rounded-xs flex items-center">
+                      Podcast
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-2xl font-bold font-headline tracking-tight text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
+                      Podimo
+                      <ExternalLink className="h-4 w-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 -translate-y-0.5 transition-all text-primary" />
+                    </h4>
+                    <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                      Escucha el catálogo editorial de The Other Narrative desde la web o la aplicación oficial de Podimo.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border/40 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  <span>Abrir en Podimo</span>
+                  <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
+
+              {/* Spreaker */}
+              <a
+                href="https://www.spreaker.com/podcast/the-other-narrative--7175122"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col justify-between p-6 sm:p-7 bg-background border border-border/70 hover:border-primary rounded-sm transition-all duration-300 hover:shadow-lg space-y-6"
+                aria-label="Escuchar The Other Narrative en Spreaker (abre en ventana nueva)"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary">
+                      RED DE DISTRIBUCIÓN
+                    </span>
+                    <span className="h-6 px-2.5 bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-wider rounded-xs flex items-center">
+                      Feed RSS
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-2xl font-bold font-headline tracking-tight text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
+                      Spreaker
+                      <ExternalLink className="h-4 w-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 -translate-y-0.5 transition-all text-primary" />
+                    </h4>
+                    <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                      Accede a la redifusión, sindicación y canal oficial de transmisión y podcast en Spreaker.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border/40 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  <span>Abrir en Spreaker</span>
+                  <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
+
+            </div>
           </div>
         </section>
 
