@@ -176,25 +176,27 @@ export default function ConcienciaPage() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-24 border-t border-b border-border/40">
-           <div className="max-w-4xl mx-auto space-y-16">
-              <div className="text-center space-y-4">
+        <section className="py-20 border-t border-b border-border/40 bg-muted/[0.04]">
+           <div className="max-w-4xl mx-auto space-y-12">
+              <div className="text-center space-y-3">
                 <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase">VOCES DE CONFIANZA</span>
-                <h3 className="text-3xl sm:text-5xl font-bold font-headline tracking-tighter">Impacto Narrativo</h3>
+                <h3 className="text-3xl sm:text-4xl font-bold font-headline tracking-tighter">Impacto Narrativo</h3>
               </div>
 
               <Carousel className="w-full">
                 <CarouselContent>
                   {displayTestimonials.map((testimonial) => (
                     <CarouselItem key={testimonial.id}>
-                      <div className="p-8 sm:p-16 text-center space-y-8">
-                        <Quote className="h-8 w-8 text-primary/20 mx-auto" />
-                        <p className="text-xl sm:text-2xl md:text-3xl font-light font-headline italic leading-relaxed text-foreground/80">
+                      <div className="p-6 sm:p-12 text-center space-y-6">
+                        <Quote className="h-6 w-6 text-primary/25 mx-auto" />
+                        <p className="text-base sm:text-lg md:text-xl font-light font-headline italic leading-relaxed text-foreground/85 max-w-2xl sm:max-w-3xl mx-auto">
                           &ldquo;{testimonial.quote}&rdquo;
                         </p>
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">{testimonial.authorName}</p>
-                          <p className="text-[9px] font-light uppercase tracking-widest text-muted-foreground">{testimonial.authorTitle}</p>
+                        <div className="space-y-1.5 pt-2">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">{testimonial.authorName}</p>
+                          {testimonial.authorTitle && (
+                            <p className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">{testimonial.authorTitle}</p>
+                          )}
                         </div>
                       </div>
                     </CarouselItem>

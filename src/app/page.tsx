@@ -307,23 +307,23 @@ export default function HomePage() {
       <section className="py-24 sm:py-32 border-t bg-muted/10 relative overflow-hidden">
         <div className="section-container">
           <div className="max-w-4xl mx-auto space-y-16">
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-3">
               <span className="text-primary font-bold text-[10px] tracking-[0.6em] uppercase">VOCES DE CONFIANZA</span>
-              <h2 className="text-3xl sm:text-5xl font-bold font-headline tracking-tighter">Impacto Narrativo</h2>
-              <p className="text-sm font-light text-muted-foreground uppercase tracking-widest">Lo que dicen las organizaciones con las que colaboramos</p>
+              <h2 className="text-3xl sm:text-4xl font-bold font-headline tracking-tighter">Impacto Narrativo</h2>
+              <p className="text-xs sm:text-sm font-light text-muted-foreground uppercase tracking-widest">Lo que dicen las organizaciones con las que colaboramos</p>
             </div>
 
             <Carousel className="w-full">
               <CarouselContent>
                 {displayTestimonials.map((testimonial) => (
                   <CarouselItem key={testimonial.id}>
-                    <div className="p-8 sm:p-16 text-center space-y-8 bg-card/60 backdrop-blur-xs rounded-sm border border-border/40 shadow-sm">
-                      <Quote className="h-8 w-8 text-primary/30 mx-auto" />
-                      <p className="text-xl sm:text-2xl md:text-3xl font-light font-headline italic leading-relaxed text-foreground/85">
+                    <div className="p-6 sm:p-12 text-center space-y-6 bg-card/60 backdrop-blur-xs rounded-sm border border-border/40 shadow-sm">
+                      <Quote className="h-6 w-6 text-primary/25 mx-auto" />
+                      <p className="text-base sm:text-lg md:text-xl font-light font-headline italic leading-relaxed text-foreground/85 max-w-2xl sm:max-w-3xl mx-auto">
                         &ldquo;{testimonial.quote}&rdquo;
                       </p>
                       <div className="space-y-1.5 pt-2">
-                        <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">{testimonial.authorName}</p>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">{testimonial.authorName}</p>
                         {testimonial.authorTitle && (
                           <p className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">{testimonial.authorTitle}</p>
                         )}
