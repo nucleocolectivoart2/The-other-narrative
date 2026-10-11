@@ -4,6 +4,9 @@ export interface SpotifyShow {
   url: string;
   image: string;
   description: string;
+  badge?: string;
+  podimoUrl?: string;
+  credits?: string;
 }
 
 export const spotifyShows: SpotifyShow[] = [
@@ -11,20 +14,26 @@ export const spotifyShows: SpotifyShow[] = [
     id: "033PCu2aysmpjGuazxZ0Oz",
     name: "The Other Narrative",
     url: "https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz",
+    podimoUrl: "https://podimo.com/en/shows/the-other-narrative",
     image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f118b74d043976031011e2bda",
-    description: "Periodismo de soluciones, regeneración e innovación conducido por Ángela María Gómez."
+    description: "Un podcast de periodismo de soluciones que explora las ideas, las personas y las organizaciones que están construyendo respuestas frente a los grandes desafíos de nuestro tiempo.",
+    badge: "PODCAST · PERIODISMO DE SOLUCIONES",
+    credits: "Creado y dirigido por Ángela María Gómez"
   },
   {
     id: "4fIwE8OUNlJkszY6XQZcO5",
     name: "Planeta Sostenible",
     url: "https://open.spotify.com/show/4fIwE8OUNlJkszY6XQZcO5",
     image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1fe9dc719e69a6ab1da9d7bda7",
-    description: "Pacto Global Red Colombia y URosario Radio. Visibilizando el liderazgo empresarial y el desarrollo regenerativo."
+    description: "Archivo de conversaciones desarrollado en el marco de Planeta Sostenible, iniciativa vinculada a Pacto Global Red Colombia y URosario Radio.",
+    badge: "ARCHIVO EDITORIAL · TRAYECTORIA",
+    credits: "Trayectoria editorial de Ángela María Gómez en colaboración con Pacto Global Red Colombia y URosario Radio"
   }
 ];
 
 export interface PodcastEpisode {
   id: string;
+  episodeNumber?: string;
   showId?: string;
   showName?: string;
   title: string;
@@ -34,34 +43,59 @@ export interface PodcastEpisode {
   guest?: string;
   category?: string;
   date?: string;
+  duration?: string;
+  featured?: boolean;
 }
 
 export const spotifyPodcasts: PodcastEpisode[] = [
-  // --- The Other Narrative (https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz) ---
+  // --- The Other Narrative (Show Principal: https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz) ---
   {
-    id: "6WBH5WFfaOkk9FlFQmFJxR",
+    id: "ton-ep-03",
+    episodeNumber: "EPISODIO 03",
     showId: "033PCu2aysmpjGuazxZ0Oz",
     showName: "The Other Narrative",
-    title: "2. Economía circular sobre ruedas",
-    description: "The Other Narrative con Ángela María Gómez: Exploramos cómo la economía circular, la regeneración y la innovación están transformando la movilidad, la industria y la gestión de recursos hacia modelos de valor compartido.",
+    title: "Equidad y complementariedad energética: nuevas miradas para transformar",
+    description: "Dos conversaciones que amplían la mirada sobre el liderazgo femenino y los desafíos energéticos. Con Isabel Noboa y Ramiro Santa, exploramos cómo cuestionar paradigmas, comprender la complementariedad de las fuentes de energía y abrir nuevas perspectivas para el desarrollo.",
+    url: "https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz",
+    image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f118b74d043976031011e2bda",
+    guest: "Isabel Noboa & Ramiro Santa",
+    category: "The Other Narrative",
+    date: "15 de septiembre de 2026",
+    duration: "33 min",
+    featured: true
+  },
+  {
+    id: "6WBH5WFfaOkk9FlFQmFJxR",
+    episodeNumber: "EPISODIO 02",
+    showId: "033PCu2aysmpjGuazxZ0Oz",
+    showName: "The Other Narrative",
+    title: "Economía circular sobre ruedas",
+    description: "¿Qué pasa con una llanta cuando termina su vida útil? Conversamos con Elmer Cardoso Guzmán, director ejecutivo de la Corporación Rueda Verde, sobre la transformación de residuos en recursos, la responsabilidad extendida del productor y los desafíos de cerrar los ciclos productivos en Colombia.",
     url: "https://open.spotify.com/episode/6WBH5WFfaOkk9FlFQmFJxR",
     image: "https://image-cdn-fa.spotifycdn.com/image/ab67656300005f1fb0fe15baf1aa424669faf50e",
-    guest: "Ángela María Gómez",
-    category: "The Other Narrative"
+    guest: "Elmer Cardoso Guzmán (Rueda Verde)",
+    category: "The Other Narrative",
+    date: "18 de agosto de 2026",
+    duration: "33 min",
+    featured: true
   },
   {
     id: "32yg7Fv9CqoKTgewQvNbkh",
+    episodeNumber: "EPISODIO 01",
     showId: "033PCu2aysmpjGuazxZ0Oz",
     showName: "The Other Narrative",
-    title: "1. Construir futuro desde la salud visual",
-    description: "En el episodio debut de The Other Narrative, analizamos el periodismo de soluciones, la salud visual y el impacto social transformador en las comunidades y territorios.",
+    title: "Construir futuro desde la salud visual",
+    description: "¿Cómo influye la salud visual en el aprendizaje, las oportunidades y la calidad de vida? Una conversación con Johanna Garzón que conecta salud, educación y desarrollo comunitario, acompañada de historias de soluciones que buscan generar resultados verificables.",
     url: "https://open.spotify.com/episode/32yg7Fv9CqoKTgewQvNbkh",
     image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f5fa13f574dfdaa787e5a5049",
-    guest: "Ángela María Gómez",
-    category: "The Other Narrative"
+    guest: "Johanna Garzón",
+    category: "The Other Narrative",
+    date: "Julio de 2026",
+    duration: "35 min",
+    featured: true
   },
 
-  // --- Planeta Sostenible (https://open.spotify.com/show/4fIwE8OUNlJkszY6XQZcO5) ---
+  // --- Planeta Sostenible (Archivo Editorial: https://open.spotify.com/show/4fIwE8OUNlJkszY6XQZcO5) ---
   {
     id: "40cX72MuwvaXMijBIxFdoa",
     showId: "4fIwE8OUNlJkszY6XQZcO5",
