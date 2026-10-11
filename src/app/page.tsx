@@ -25,6 +25,7 @@ import { extractYouTubeId } from '@/lib/default-settings';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query } from 'firebase/firestore';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { HeroPodcastBar } from '@/components/HeroPodcastBar';
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0);
@@ -92,7 +93,7 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen bg-background relative selection:bg-primary/30 overflow-x-hidden">
       
       {/* Hero Section */}
-      <section id="hero" className="relative min-h-screen w-full flex flex-col justify-center overflow-hidden bg-black pt-20 sm:pt-24 pb-28 sm:pb-32">
+      <section id="hero" className="relative min-h-[85vh] lg:min-h-[90vh] w-full flex flex-col justify-between overflow-hidden bg-black pt-20 sm:pt-24 pb-0">
         <div className="absolute inset-0 z-0 overflow-hidden bg-zinc-950">
           <div 
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none will-change-transform"
@@ -115,12 +116,12 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/85 z-10 pointer-events-none" />
         </div>
 
-        <div className="section-container relative z-20 w-full">
-          <div className="max-w-5xl">
+        <div className="section-container relative z-20 w-full py-10 sm:py-14 my-auto">
+          <div className="max-w-4xl space-y-6 sm:space-y-8">
             
-            {/* Logo Arquitectónico Oficial (+10% Escala, animado y con proporciones cinematográficas) */}
-            <div className="flex flex-col items-start mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out fill-mode-both">
-              <div className="relative w-full max-w-[460px] sm:max-w-[640px] md:max-w-[780px] lg:max-w-[850px] h-28 sm:h-40 md:h-52 lg:h-60">
+            {/* Logo Arquitectónico Oficial */}
+            <div className="flex flex-col items-start animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out fill-mode-both">
+              <div className="relative w-full max-w-[360px] sm:max-w-[480px] md:max-w-[560px] lg:max-w-[620px] xl:max-w-[700px] h-20 sm:h-28 md:h-36 lg:h-40 xl:h-44">
                 <Image
                   src="https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/para%20fondo%20negro/logo_.png"
                   alt="The Other Narrative"
@@ -131,29 +132,30 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Mensajes de Valor (-15% a 20% más compactos y equilibrados) */}
-            <div className="space-y-4 sm:space-y-5 max-w-3xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300 ease-out fill-mode-both">
+            {/* Titulares Editoriales */}
+            <div className="space-y-4 sm:space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300 ease-out fill-mode-both">
               <div className="flex flex-col gap-1.5 sm:gap-2">
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold tracking-tight uppercase leading-tight">
+                <p className="text-xl sm:text-2xl md:text-3xl text-white font-bold tracking-tight uppercase leading-tight">
                   {settings.heroTitleLine1} <span className="text-primary italic font-headline lowercase">{settings.heroTitleHighlight1}</span>
                 </p>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-bold tracking-tight uppercase leading-tight">
+                <p className="text-xl sm:text-2xl md:text-3xl text-white font-bold tracking-tight uppercase leading-tight">
                   {settings.heroTitleLine2} <span className="text-primary italic font-headline lowercase">{settings.heroTitleHighlight2}</span>
                 </p>
               </div>
 
               {/* Bloque de Propósito Editorial */}
-              <div className="border-l-2 border-primary/40 max-w-xl mt-4 sm:mt-5 pl-5 py-1">
-                <p className="text-xs sm:text-sm md:text-[15px] text-white/80 font-light leading-relaxed">
+              <div className="border-l-2 border-primary/40 max-w-2xl mt-4 sm:mt-5 pl-5 py-1">
+                <p className="text-xs sm:text-sm md:text-base text-white/80 font-light leading-relaxed">
                   {settings.heroPurpose}
                 </p>
               </div>
             </div>
+
           </div>
         </div>
 
         {/* Action Bar Inferior - Equilibrada sin tapar el contenido */}
-        <div className="absolute bottom-0 left-0 w-full bg-black/40 backdrop-blur-md border-t border-white/5 py-4 sm:py-6 z-40 transition-all duration-1000 delay-700">
+        <div className="w-full bg-black/50 backdrop-blur-md border-t border-white/10 py-4 sm:py-5 z-20">
           <div className="section-container flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex gap-4">
               <Link 
@@ -182,12 +184,16 @@ export default function HomePage() {
             <button 
               onClick={() => scrollToSection('mission')}
               className="text-white/60 hover:text-primary transition-all animate-bounce hidden sm:block"
+              aria-label="Desplazar a Articular Realidades"
             >
               <ChevronDown className="h-5 w-5" />
             </button>
           </div>
         </div>
       </section>
+
+      {/* Barra Horizontal de Podcast · The Other Narrative (Entre botones del Hero y Articular Realidades) */}
+      <HeroPodcastBar />
 
       {/* Misión con Profundidad Visual */}
       <section id="mission" className="relative py-24 sm:py-32 overflow-hidden bg-background">
