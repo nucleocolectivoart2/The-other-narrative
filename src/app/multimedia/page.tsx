@@ -103,7 +103,8 @@ export default function MultimediaPage() {
         category: 'The Other Narrative',
         date: fp.date || 'Reciente',
         duration: fp.duration || '30 min',
-        featured: true
+        featured: true,
+        spreakerUrl: fp.spreakerUrl
       }));
 
     // Combinar sin duplicados por URL o ID
@@ -153,15 +154,23 @@ export default function MultimediaPage() {
     return null;
   };
 
-  const getSpotifyEmbedUrl = (url?: string) => {
-    if (!url) return '';
-    if (url.includes('spotify.com/episode/')) {
-      return url.replace('spotify.com/episode/', 'spotify.com/embed/episode/');
+  const getAudioEmbedUrl = (url?: string, spreakerUrl?: string) => {
+    if (url) {
+      if (url.includes('spotify.com/episode/')) {
+        return url.replace('spotify.com/episode/', 'spotify.com/embed/episode/');
+      }
+      if (url.includes('spotify.com/show/')) {
+        return url.replace('spotify.com/show/', 'spotify.com/embed/show/');
+      }
     }
-    if (url.includes('spotify.com/show/')) {
-      return url.replace('spotify.com/show/', 'spotify.com/embed/show/');
+    const targetSpreaker = spreakerUrl || (url && url.includes('spreaker.com') ? url : '');
+    if (targetSpreaker) {
+      const match = targetSpreaker.match(/--(\d+)/);
+      if (match && match[1]) {
+        return `https://widget.spreaker.com/player?episode_id=${match[1]}&theme=light&playlist=false&playlist-continuous=false&chapters-image=true&episode_image_position=left&hide-logo=false&hide-likes=false&hide-comments=false&hide-sharing=false&hide-download=false`;
+      }
     }
-    return url;
+    return url || '';
   };
 
   const defaultPodcastImage = mainShow.image;
@@ -614,7 +623,7 @@ export default function MultimediaPage() {
                       </div>
 
                       {/* Acciones de la Tarjeta */}
-                      <div className="pt-4 border-t border-border/40 flex items-center justify-between gap-4">
+                      <div className="pt-4 border-t border-border/40 flex flex-wrap items-center justify-between gap-3">
                         <Button
                           variant="default"
                           size="sm"
@@ -627,15 +636,28 @@ export default function MultimediaPage() {
                           <Play className="h-3 w-3 fill-current" /> Escuchar episodio
                         </Button>
 
-                        <a
-                          href={ep.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 p-2"
-                          title="Abrir en Spotify"
-                        >
-                          Spotify <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <div className="flex items-center gap-2">
+                          {ep.spreakerUrl && (
+                            <a
+                              href={ep.spreakerUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 py-1 px-1.5"
+                              title="Abrir en Spreaker"
+                            >
+                              Spreaker <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                          <a
+                            href={ep.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 py-1 px-1.5"
+                            title="Abrir en Spotify"
+                          >
+                            Spotify <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
                       </div>
                     </div>
 
@@ -1125,7 +1147,7 @@ export default function MultimediaPage() {
                 isPlayerMinimized ? "h-0 opacity-0 overflow-hidden pointer-events-none" : "h-[152px] opacity-100"
               )}>
                 <iframe 
-                  src={getSpotifyEmbedUrl(activePodcast.url)} 
+                  src={getAudioEmbedUrl(activePodcast.url, activePodcast.spreakerUrl)} 
                   width="100%" 
                   height="152"
                   frameBorder="0" 

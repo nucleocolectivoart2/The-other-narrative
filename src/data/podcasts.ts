@@ -47,18 +47,36 @@ export interface PodcastEpisode {
   date?: string;
   duration?: string;
   featured?: boolean;
+  spreakerUrl?: string;
 }
 
 export const spotifyPodcasts: PodcastEpisode[] = [
   // --- The Other Narrative (Show Principal: https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz) ---
   {
-    id: "ton-ep-03",
+    id: "3J2glWA2OFZgXPWr3vNYSl",
+    episodeNumber: "EPISODIO 04",
+    showId: "033PCu2aysmpjGuazxZ0Oz",
+    showName: "The Other Narrative",
+    title: "Sostenibilidad bajo presión: evidencia, justicia climática y liderazgo",
+    description: "¿Qué tienen en común una etiqueta que promete ser verde, la crisis climática en las montañas de Nepal y llegar a la cima del Everest? En este episodio conectamos tres historias para entender por qué la sostenibilidad necesita hoy menos promesas y más evidencia, responsabilidad y acción. Conversamos con Fernando González Rubio, primer colombiano en alcanzar la cima del Everest, sobre las lecciones que dejan las grandes montañas: disciplina, perseverancia, respeto, trabajo en equipo y propósito.",
+    url: "https://open.spotify.com/episode/3J2glWA2OFZgXPWr3vNYSl",
+    spreakerUrl: "https://www.spreaker.com/episode/4-sostenibilidad-bajo-presion-evidencia-justicia-climatica-y-liderazgo--75793759",
+    image: "https://i.scdn.co/image/ab6765630000ba8acce6774d3293f6072561ec44",
+    guest: "Fernando González Rubio",
+    category: "The Other Narrative",
+    date: "14 de octubre de 2026",
+    duration: "27 min",
+    featured: true
+  },
+  {
+    id: "63X1YCbEhNCGejStLh1cK1",
     episodeNumber: "EPISODIO 03",
     showId: "033PCu2aysmpjGuazxZ0Oz",
     showName: "The Other Narrative",
     title: "Equidad y complementariedad energética: nuevas miradas para transformar",
     description: "Dos conversaciones que amplían la mirada sobre el liderazgo femenino y los desafíos energéticos. Con Isabel Noboa y Ramiro Santa, exploramos cómo cuestionar paradigmas, comprender la complementariedad de las fuentes de energía y abrir nuevas perspectivas para el desarrollo.",
-    url: "https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz",
+    url: "https://open.spotify.com/episode/63X1YCbEhNCGejStLh1cK1",
+    spreakerUrl: "https://www.spreaker.com/episode/3-equidad-y-complementariedad-energetica--75136124",
     image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f118b74d043976031011e2bda",
     guest: "Isabel Noboa & Ramiro Santa",
     category: "The Other Narrative",
@@ -74,6 +92,7 @@ export const spotifyPodcasts: PodcastEpisode[] = [
     title: "Economía circular sobre ruedas",
     description: "¿Qué pasa con una llanta cuando termina su vida útil? Conversamos con Elmer Cardoso Guzmán, director ejecutivo de la Corporación Rueda Verde, sobre la transformación de residuos en recursos, la responsabilidad extendida del productor y los desafíos de cerrar los ciclos productivos en Colombia.",
     url: "https://open.spotify.com/episode/6WBH5WFfaOkk9FlFQmFJxR",
+    spreakerUrl: "https://www.spreaker.com/episode/2-economia-circular-sobre-ruedas--74235717",
     image: "https://image-cdn-fa.spotifycdn.com/image/ab67656300005f1fb0fe15baf1aa424669faf50e",
     guest: "Elmer Cardoso Guzmán (Rueda Verde)",
     category: "The Other Narrative",
@@ -89,6 +108,7 @@ export const spotifyPodcasts: PodcastEpisode[] = [
     title: "Construir futuro desde la salud visual",
     description: "¿Cómo influye la salud visual en el aprendizaje, las oportunidades y la calidad de vida? Una conversación con Johanna Garzón que conecta salud, educación y desarrollo comunitario, acompañada de historias de soluciones que buscan generar resultados verificables.",
     url: "https://open.spotify.com/episode/32yg7Fv9CqoKTgewQvNbkh",
+    spreakerUrl: "https://www.spreaker.com/episode/1-construir-futuro-desde-la-salud-visual--72944118",
     image: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f5fa13f574dfdaa787e5a5049",
     guest: "Johanna Garzón",
     category: "The Other Narrative",

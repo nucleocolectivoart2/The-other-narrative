@@ -21,7 +21,7 @@ export default function ProyectosPage() {
       id: 'mock-p1',
       title: 'Estrategia COP16: Diálogos de Cambio',
       category: 'Regeneración',
-      description: 'Construcción de la narrativa estratégica para el Hub de Comunicación Responsable durante la cumbre de biodiversidad más importante del mundo.',
+      description: 'Construcción de la narrativa estratégica durante la cumbre de biodiversidad más importante del mundo.',
       image: 'https://raw.githubusercontent.com/nucleocolectivoart2/The-other-narrative/main/img/03.png',
       link: '/multimedia',
       ods: [16, 17, 10]

@@ -25,18 +25,18 @@ export interface LatestEpisodeData {
 }
 
 const DEFAULT_EPISODE: LatestEpisodeData = {
-  episodeId: "75136124",
-  title: "Equidad y complementariedad energética",
-  episodeNumber: "EPISODIO 03",
-  subtitle: "Nuevas miradas para transformar",
-  description: "Descubre nuestra conversación más reciente sobre sostenibilidad, innovación y soluciones.",
-  spreakerUrl: "https://www.spreaker.com/episode/3-equidad-y-complementariedad-energetica--75136124",
+  episodeId: "75793759",
+  title: "Sostenibilidad bajo presión: evidencia, justicia climática y liderazgo",
+  episodeNumber: "EPISODIO 04",
+  subtitle: "Evidencia, justicia climática y liderazgo",
+  description: "Tres historias para entender por qué la sostenibilidad necesita hoy menos promesas y más evidencia, responsabilidad y acción.",
+  spreakerUrl: "https://www.spreaker.com/episode/4-sostenibilidad-bajo-presion-evidencia-justicia-climatica-y-liderazgo--75793759",
   spreakerShowUrl: "https://www.spreaker.com/podcast/the-other-narrative--7175122",
   spotifyShowUrl: "https://open.spotify.com/show/033PCu2aysmpjGuazxZ0Oz",
   podimoShowUrl: "https://podimo.com/en/shows/the-other-narrative",
-  imageUrl: "https://d3wo5wojvuv7l.cloudfront.net/t_square_limited_160/images.spreaker.com/original/38cb7bb9be1eef3a684443b1042baa38.jpg",
-  publishedAt: "15 de septiembre de 2026",
-  duration: "33 min",
+  imageUrl: "https://d3wo5wojvuv7l.cloudfront.net/t_square_limited_160/images.spreaker.com/original/8fb0620950fd73701fd9d1637a9772d8.jpg",
+  publishedAt: "14 de octubre de 2026",
+  duration: "27 min",
 };
 
 export function HeroPodcastBar() {
